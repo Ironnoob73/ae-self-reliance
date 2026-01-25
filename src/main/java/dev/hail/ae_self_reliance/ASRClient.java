@@ -11,8 +11,8 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(value = AeSelfRelianceMod.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = AeSelfRelianceMod.MOD_ID, value = Dist.CLIENT)
-public class ExampleModClient {
-    public ExampleModClient(ModContainer container) {
+public class ASRClient {
+    public ASRClient(ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 

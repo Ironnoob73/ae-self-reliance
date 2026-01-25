@@ -1,6 +1,9 @@
 package dev.hail.ae_self_reliance.blocks;
 
+import appeng.api.config.Actionable;
+import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
+import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.ticking.IGridTickable;
 import appeng.api.networking.ticking.TickRateModulation;
 import appeng.api.networking.ticking.TickingRequest;
@@ -10,12 +13,16 @@ import appeng.api.upgrades.UpgradeInventories;
 import appeng.api.util.AECableType;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.core.AEConfig;
+import appeng.core.settings.TickRates;
+import appeng.util.Platform;
+import dev.hail.ae_self_reliance.ASRConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
@@ -23,16 +30,18 @@ import java.util.List;
 public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntity implements IGridTickable, IUpgradeableObject {
     private final IUpgradeInventory upgrades;
     public boolean isOn;
-    private final double minEnergyRate;
-    private final double baseMaxEnergyRate;
+    public int skyLight;
+    private final double baseEnergyRate;
     private final double initialEnergyRate;
+    private double currentEnergyProducePerTick;
 
     public SunlightResonanceGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ASRBlocks.SUNLIGHT_RESONANCE_GENERATOR_BE.get(), pos, blockState);
-        this.upgrades = UpgradeInventories.forMachine(ASRBlocks.SUNLIGHT_RESONANCE_GENERATOR, 3, this::saveChanges);
-        this.minEnergyRate = AEConfig.instance().getVibrationChamberMinEnergyPerGameTick();
-        this.baseMaxEnergyRate = AEConfig.instance().getVibrationChamberMaxEnergyPerGameTick();
-        this.initialEnergyRate = Mth.clamp(AEConfig.instance().getVibrationChamberBaseEnergyPerFuelTick(), this.minEnergyRate, this.baseMaxEnergyRate);
+        this.getMainNode().setIdlePowerUsage(0.0F).setFlags().addService(IGridTickable.class, this);
+        this.upgrades = UpgradeInventories.forMachine(ASRBlocks.SUNLIGHT_RESONANCE_GENERATOR, 4, this::saveChanges);
+        this.baseEnergyRate = ASRConfig.INSTANCE.commonConfig.sunlightGeneratesEnergyPerTick.getAsDouble();
+        this.initialEnergyRate = Mth.clamp(AEConfig.instance().getVibrationChamberBaseEnergyPerFuelTick(), 0, this.baseEnergyRate);
+        this.currentEnergyProducePerTick = this.initialEnergyRate;
     }
 
     public AECableType getCableConnectionType(Direction dir) {
@@ -47,11 +56,9 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
     }
     protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
-        //this.isOn = this.getRemainingFuelTicks() > 0.0;
         data.writeBoolean(this.isOn);
     }
 
-    // Upgrades
     public void addAdditionalDrops(Level level, BlockPos pos, List<ItemStack> drops) {
         super.addAdditionalDrops(level, pos, drops);
         for (ItemStack upgrade : this.upgrades) {
@@ -68,11 +75,33 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
 
     @Override
     public TickingRequest getTickingRequest(IGridNode iGridNode) {
-        return null;
+        this.markForUpdate();
+        if (this.hasLevel()) {
+            Platform.notifyBlocksOfNeighbors(this.level, this.worldPosition);
+        }
+        return new TickingRequest(TickRates.VibrationChamber, skyLight != 0);
     }
 
     @Override
-    public TickRateModulation tickingRequest(IGridNode iGridNode, int i) {
-        return null;
+    public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        if (this.level != null) {
+            skyLight = level.getBrightness(LightLayer.SKY, getBlockPos().above()) - level.getSkyDarken();
+        }
+        if (skyLight != 0){
+            this.markForUpdate();
+            if (this.hasLevel()) {
+                Platform.notifyBlocksOfNeighbors(this.level, this.worldPosition);
+            }
+            IGrid grid = node.getGrid();
+            IEnergyService energy = grid.getEnergyService();
+            double speedScalingPerTick = ((skyLight * this.baseEnergyRate) - this.currentEnergyProducePerTick) / 100D;
+            double speedStep = (double)ticksSinceLastCall * speedScalingPerTick;
+            this.currentEnergyProducePerTick += speedStep;
+            energy.injectPower(this.currentEnergyProducePerTick, Actionable.MODULATE);
+            return TickRateModulation.FASTER;
+        }
+        this.currentEnergyProducePerTick = this.initialEnergyRate;
+        return TickRateModulation.SLOWER;
     }
+
 }

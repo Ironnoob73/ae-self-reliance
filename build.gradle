@@ -84,8 +84,7 @@ configurations {
 dependencies {
     implementation "curse.maven:jei-238222:5846880"
     implementation "curse.maven:jade-324717:6291517"
-
-    implementation("curse.maven:applied-energistics-2-223794:7027323")
+    implementation("org.appliedenergistics:appliedenergistics2:19.2.17")
     implementation("curse.maven:guideme-1173950:6331224")
 }
 
