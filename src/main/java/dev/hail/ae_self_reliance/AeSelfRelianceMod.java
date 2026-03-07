@@ -1,15 +1,14 @@
 package dev.hail.ae_self_reliance;
 
 import com.mojang.logging.LogUtils;
+import dev.hail.ae_self_reliance.blocks.ASRBlockEntities;
 import dev.hail.ae_self_reliance.blocks.ASRBlocks;
 import dev.hail.ae_self_reliance.blocks.ASRMenus;
 import dev.hail.ae_self_reliance.items.ASRItems;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -27,8 +26,8 @@ public class AeSelfRelianceMod {
         NeoForge.EVENT_BUS.register(this);
 
         ASRConfig.register(modContainer);
-        ASRBlocks.BLOCKS.register(modEventBus);
-        ASRBlocks.BLOCK_ENTITY_TYPES.register(modEventBus);
+        ASRBlocks.INSTANCE.register(modEventBus);
+        ASRBlockEntities.INSTANCE.register(modEventBus);
         ASRItems.ITEMS.register(modEventBus);
         ASRMenus.MENU_TYPES.register(modEventBus);
         ASRCreativeTab.CREATIVE_MODE_TABS.register(modEventBus);

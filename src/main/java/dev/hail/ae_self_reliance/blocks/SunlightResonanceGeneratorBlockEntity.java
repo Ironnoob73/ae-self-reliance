@@ -1,6 +1,5 @@
 package dev.hail.ae_self_reliance.blocks;
 
-import appeng.api.AECapabilities;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
@@ -36,7 +35,7 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
     private double currentEnergyProducePerTick;
 
     public SunlightResonanceGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
-        super(ASRBlocks.SUNLIGHT_RESONANCE_GENERATOR_BE.get(), pos, blockState);
+        super(ASRBlockEntities.SUNLIGHT_RESONANCE_GENERATOR.get(), pos, blockState);
         this.getMainNode().setIdlePowerUsage(0.0F).setFlags().addService(IGridTickable.class, this);
         this.upgrades = UpgradeInventories.forMachine(ASRBlocks.SUNLIGHT_RESONANCE_GENERATOR, 4, this::saveChanges);
         this.baseEnergyRate = ASRConfig.INSTANCE.commonConfig.sunlightGeneratesEnergyPerTick.getAsDouble();

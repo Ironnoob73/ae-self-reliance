@@ -86,7 +86,8 @@ dependencies {
     implementation "curse.maven:jade-324717:6291517"
     implementation "org.appliedenergistics:appliedenergistics2:19.2.17"
     implementation "curse.maven:guideme-1173950:6331224"
-    implementation "curse.maven:ae2-crystal-science-1435174:7501563"
+    //implementation "curse.maven:ae2-crystal-science-1435174:7501563"
+    implementation "curse.maven:ae2addonlib-1366135:7222312"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
