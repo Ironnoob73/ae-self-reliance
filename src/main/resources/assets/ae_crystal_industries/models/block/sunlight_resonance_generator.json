@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ae2:block/generics/bottom",
+    "east": "ae_crystal_industries:block/sunlight_resonance_generator/side_off",
+    "north": "ae_crystal_industries:block/sunlight_resonance_generator/front_off",
+    "particle": "ae_crystal_industries:block/sunlight_resonance_generator/side_off",
+    "south": "ae_crystal_industries:block/sunlight_resonance_generator/back_off",
+    "up": "ae_crystal_industries:block/sunlight_resonance_generator/top_off",
+    "west": "ae_crystal_industries:block/sunlight_resonance_generator/side_off"
+  }
+}
