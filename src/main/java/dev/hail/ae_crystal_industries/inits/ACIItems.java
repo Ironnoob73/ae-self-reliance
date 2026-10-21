@@ -1,4 +1,4 @@
-package dev.hail.ae_crystal_industries.items;
+package dev.hail.ae_crystal_industries.inits;
 
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
 import net.pedroksl.ae2addonlib.registry.ItemRegistry;
@@ -10,11 +10,11 @@ import net.pedroksl.ae2addonlib.registry.ItemRegistry;
  * created, because AE2AddonLib's {@code BlockRegistry.block()} looks up the item deferred-register of the same mod id
  * when it registers the block item.
  */
-public final class ASRItems extends ItemRegistry {
+public final class ACIItems extends ItemRegistry {
 
-    public static final ASRItems INSTANCE = new ASRItems();
+    public static final ACIItems INSTANCE = new ACIItems();
 
-    ASRItems() {
+    ACIItems() {
         super(AeCrystalIndustriesMod.MOD_ID);
     }
 }

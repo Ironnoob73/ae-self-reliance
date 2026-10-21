@@ -1,8 +1,10 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.inits;
 
 import appeng.menu.AEBaseMenu;
 import appeng.menu.implementations.MenuTypeBuilder;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
+import dev.hail.ae_crystal_industries.blocks.SunlightResonanceGeneratorBlockEntity;
+import dev.hail.ae_crystal_industries.blocks.SunlightResonanceGeneratorMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.pedroksl.ae2addonlib.registry.MenuRegistry;
 

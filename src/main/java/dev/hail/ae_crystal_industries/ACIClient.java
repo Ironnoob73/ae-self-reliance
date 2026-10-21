@@ -1,6 +1,6 @@
 package dev.hail.ae_crystal_industries;
 
-import dev.hail.ae_crystal_industries.blocks.ACIScreens;
+import dev.hail.ae_crystal_industries.inits.ACIScreens;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;

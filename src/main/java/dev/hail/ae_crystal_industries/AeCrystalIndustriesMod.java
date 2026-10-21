@@ -1,10 +1,7 @@
 package dev.hail.ae_crystal_industries;
 
 import com.mojang.logging.LogUtils;
-import dev.hail.ae_crystal_industries.blocks.ACIBlockEntities;
-import dev.hail.ae_crystal_industries.blocks.ACIBlocks;
-import dev.hail.ae_crystal_industries.blocks.ACIMenus;
-import dev.hail.ae_crystal_industries.items.ASRItems;
+import dev.hail.ae_crystal_industries.inits.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -32,7 +29,7 @@ public class AeCrystalIndustriesMod {
         // The item registry must be initialized before the block registry: ae2addonlib's
         // BlockRegistry.block() looks up the item deferred-register of this mod id when it
         // registers the block item, and throws if it does not exist yet.
-        ASRItems.INSTANCE.register(modEventBus);
+        ACIItems.INSTANCE.register(modEventBus);
         ACIBlocks.INSTANCE.register(modEventBus);
         ACIBlockEntities.INSTANCE.register(modEventBus);
         ACIMenus.INSTANCE.register(modEventBus);

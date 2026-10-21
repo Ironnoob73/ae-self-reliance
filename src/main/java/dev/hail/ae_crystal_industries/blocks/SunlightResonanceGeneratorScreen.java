@@ -13,7 +13,7 @@ import net.minecraft.world.level.LightLayer;
 
 public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<SunlightResonanceGeneratorMenu> {
 
-    private static final Blitter LIGHT_LEVEL = Blitter.texture("guis/ae_self_reliance/sunlight_resonance_generator.png").src(176, 0, 20, 21);
+    private static final Blitter LIGHT_LEVEL = Blitter.texture("guis/ae_crystal_industries/sunlight_resonance_generator.png").src(176, 0, 20, 21);
 
     public SunlightResonanceGeneratorScreen(SunlightResonanceGeneratorMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);

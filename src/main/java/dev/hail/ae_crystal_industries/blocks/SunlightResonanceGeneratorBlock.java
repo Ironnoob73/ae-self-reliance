@@ -1,10 +1,10 @@
 package dev.hail.ae_crystal_industries.blocks;
 
 import appeng.api.orientation.IOrientationStrategy;
-import appeng.api.orientation.OrientationStrategies;
 import appeng.block.AEBaseEntityBlock;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuLocators;
+import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class SunlightResonanceGeneratorBlock extends AEBaseEntityBlock<SunlightResonanceGeneratorBlockEntity>{
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -32,9 +33,9 @@ public class SunlightResonanceGeneratorBlock extends AEBaseEntityBlock<SunlightR
     }
     @Override
     public IOrientationStrategy getOrientationStrategy() {
-        return OrientationStrategies.full();
+        return super.getOrientationStrategy();
     }
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         BlockEntity var7 = level.getBlockEntity(pos);
         if (var7 instanceof SunlightResonanceGeneratorBlockEntity be) {
             if (!level.isClientSide) {

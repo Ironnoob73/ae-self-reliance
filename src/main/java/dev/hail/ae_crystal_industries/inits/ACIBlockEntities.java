@@ -1,9 +1,10 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.inits;
 
 import appeng.block.AEBaseEntityBlock;
 import appeng.blockentity.AEBaseBlockEntity;
 import appeng.core.definitions.BlockDefinition;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
+import dev.hail.ae_crystal_industries.blocks.SunlightResonanceGeneratorBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.pedroksl.ae2addonlib.registry.BlockEntityRegistry;
 

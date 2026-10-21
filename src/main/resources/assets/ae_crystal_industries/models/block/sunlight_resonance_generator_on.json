@@ -1,12 +1,78 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/block",
   "textures": {
-    "down": "ae2:block/generics/bottom",
-    "east": "ae_crystal_industries:block/sunlight_resonance_generator/side_on",
-    "north": "ae_crystal_industries:block/sunlight_resonance_generator/front_on",
-    "particle": "ae_crystal_industries:block/sunlight_resonance_generator/side_on",
-    "south": "ae_crystal_industries:block/sunlight_resonance_generator/back_on",
-    "up": "ae_crystal_industries:block/sunlight_resonance_generator/top_on",
-    "west": "ae_crystal_industries:block/sunlight_resonance_generator/side_on"
-  }
+    "bottom": "ae2:block/growth_accelerator_bottom",
+    "side": "ae_crystal_industries:block/sunlight_resonance_generator_side_on",
+    "top": "ae_crystal_industries:block/sunlight_resonance_generator_top_on",
+    "side_light": "ae_crystal_industries:block/sunlight_resonance_generator_side_on_light",
+    "top_light": "ae_crystal_industries:block/sunlight_resonance_generator_top_on_light",
+    "particle": "#side"
+  },
+  "render_type": "cutout",
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side",
+          "cullface": "north"
+        },
+        "east": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side",
+          "cullface": "east"
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "up": { "uv": [16, 0, 0, 16], "texture": "#top", "cullface": "up" },
+        "down": { "uv": [16, 0, 0, 16], "texture": "#bottom", "cullface": "down" }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side_light",
+          "cullface": "north",
+          "neoforge_data": { "block_light": 15, "sky_light": 15 }
+        },
+        "east": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side_light",
+          "cullface": "east",
+          "neoforge_data": { "block_light": 15, "sky_light": 15 }
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side_light",
+          "cullface": "south",
+          "neoforge_data": { "block_light": 15, "sky_light": 15 }
+        },
+        "west": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#side_light",
+          "cullface": "west",
+          "neoforge_data": { "block_light": 15, "sky_light": 15 }
+        },
+        "up": {
+          "uv": [16, 0, 0, 16],
+          "texture": "#top_light",
+          "cullface": "up",
+          "neoforge_data": { "block_light": 15, "sky_light": 15 }
+        }
+      }
+    }
+  ]
 }

@@ -1,6 +1,6 @@
-package dev.hail.ae_crystal_industries;
+package dev.hail.ae_crystal_industries.inits;
 
-import dev.hail.ae_crystal_industries.blocks.ACIBlocks;
+import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
 import net.minecraft.network.chat.Component;
 import net.pedroksl.ae2addonlib.registry.CreativeTabRegistry;
 

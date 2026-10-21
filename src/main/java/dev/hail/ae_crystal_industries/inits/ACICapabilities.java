@@ -1,8 +1,7 @@
-package dev.hail.ae_crystal_industries;
+package dev.hail.ae_crystal_industries.inits;
 
 import appeng.api.AECapabilities;
 import appeng.api.networking.IInWorldGridNodeHost;
-import dev.hail.ae_crystal_industries.blocks.ACIBlockEntities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 /**

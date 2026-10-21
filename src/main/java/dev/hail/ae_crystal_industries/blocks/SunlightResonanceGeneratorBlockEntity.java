@@ -15,6 +15,7 @@ import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.core.settings.TickRates;
 import appeng.util.Platform;
 import dev.hail.ae_crystal_industries.ACIConfig;
+import dev.hail.ae_crystal_industries.inits.ACIBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -59,7 +60,7 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
      * detector gets away with measuring its own position only because that block is transparent.
      */
     private int getSkyLightLevel() {
-        if (this.level == null || !this.level.dimensionType().hasSkyLight()) {
+        if (this.level == null || !this.level.dimensionType().hasSkyLight() || !this.level.canSeeSky(this.worldPosition.above())) {
             return 0;
         }
         return Math.max(0,

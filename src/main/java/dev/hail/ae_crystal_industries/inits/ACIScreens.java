@@ -1,6 +1,7 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.inits;
 
 import appeng.init.client.InitScreens;
+import dev.hail.ae_crystal_industries.blocks.SunlightResonanceGeneratorScreen;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 public class ACIScreens
@@ -10,6 +11,6 @@ public class ACIScreens
         InitScreens.register(event,
                 ACIMenus.SUNLIGHT_RESONANCE_GENERATOR_MENU.get(),
                 SunlightResonanceGeneratorScreen::new,
-                "/screens/asr_sunlight_resonance_generator.json");
+                "/screens/aci_sunlight_resonance_generator.json");
     }
 }
