@@ -19,10 +19,12 @@ import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIMenus;
+import dev.hail.ae_crystal_industries.inits.ACIItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -139,6 +141,11 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     @Override
     public long getStoredEnergy() {
         return this.logic.getStoredEnergy();
+    }
+
+    @Override
+    public ItemStack getMainMenuIcon() {
+        return ACIItems.ENERGY_INTERFACE_PART.get().getDefaultInstance();
     }
 
     @Override

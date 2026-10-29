@@ -11,15 +11,21 @@ import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.Objects;
-
 public class SetValueMenu extends AEBaseMenu implements ISubMenu {
 
     public static final String ACTION_SET_VALUE = "setValue";
 
+    /**
+     * AE2 synchronizes this field with {@code FriendlyByteBuf#writeUtf}, which does not accept {@code null}. It must
+     * therefore never be null, otherwise opening this menu crashes while the initial data is sent to the client
+     * ({@code sendAllDataToRemote} is called before {@link #open} can assign the real name).
+     */
     @GuiSync(1)
-    private String valueName;
+    private String valueName = "";
 
+    /**
+     * The value and maximum are sent after the menu has been opened, so their defaults have to be serializable too.
+     */
     @GuiSync(2)
     private long initialValue = -1;
 
@@ -49,9 +55,18 @@ public class SetValueMenu extends AEBaseMenu implements ISubMenu {
     }
 
     private void setValueToChange(String valueName, long initialValue, long maxValue) {
-        this.valueName = valueName;
+        // Keep this field non-null, it is synchronized as a raw UTF string.
+        this.valueName = valueName != null ? valueName : "";
         this.initialValue = initialValue;
         this.maxValue = maxValue;
+    }
+
+    /**
+     * @return true once the server has sent the actual value/maximum to this menu (the client's initial copy only
+     *         contains the defaults).
+     */
+    public boolean hasValue() {
+        return !valueName.isEmpty() && maxValue >= 0;
     }
 
     public long getMaxValue() {
@@ -68,12 +83,15 @@ public class SetValueMenu extends AEBaseMenu implements ISubMenu {
             return;
         }
 
-        if (!Objects.equals(host.getValue(valueName), value)) {
-            host.returnToMainMenu(getPlayer(), this);
-            return;
+        if (host.hasValue(valueName)) {
+            // The client is not trusted with the limits, apply them again on the server.
+            long max = host.getMaxValue(valueName);
+            if (maxValue >= 0) {
+                max = Math.min(max, maxValue);
+            }
+            host.setValue(valueName, Math.clamp(value, 0L, max));
         }
 
-        host.setValue(valueName, value);
         host.returnToMainMenu(getPlayer(), this);
     }
 }

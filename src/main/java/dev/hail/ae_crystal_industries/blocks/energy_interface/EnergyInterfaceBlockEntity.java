@@ -148,6 +148,11 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
+    public ItemStack getMainMenuIcon() {
+        return ACIBlocks.ENERGY_INTERFACE.get().asItem().getDefaultInstance();
+    }
+
+    @Override
     public int getAePerFe() {
         return this.logic.getAePerFe();
     }

@@ -39,6 +39,10 @@ public final class EnergyInterfaceLogic {
             2_500_000, 5_000_000, 10_000_000, 25_000_000, 50_000_000, 100_000_000
     };
 
+    public static final long MAX_OUTPUT_RATE = OUTPUT_RATE_STEPS[OUTPUT_RATE_STEPS.length - 1];
+    public static final long MIN_CAPACITY = CAPACITY_STEPS[0];
+    public static final long MAX_CAPACITY = CAPACITY_STEPS[CAPACITY_STEPS.length - 1];
+
     private final IManagedGridNode mainNode;
     private final IUpgradeInventory upgrades;
     private final Runnable saveChanges;
@@ -149,12 +153,25 @@ public final class EnergyInterfaceLogic {
         saveChanges.run();
     }
 
-    public void setOutputRate(long value){
-        this.outputRate = value;
+    public void setOutputRate(long value) {
+        long newRate = Math.clamp(value, 0, MAX_OUTPUT_RATE);
+        if (newRate == outputRate) {
+            return;
+        }
+        this.outputRate = newRate;
+        saveChanges.run();
     }
 
-    public void setCapacity(long value){
-        this.capacity = value;
+    public void setCapacity(long value) {
+        long newCapacity = Math.clamp(value, MIN_CAPACITY, MAX_CAPACITY);
+        if (newCapacity == capacity) {
+            return;
+        }
+        this.capacity = newCapacity;
+        if (storedEnergy > capacity) {
+            storedEnergy = capacity;
+        }
+        saveChanges.run();
     }
 
     /**

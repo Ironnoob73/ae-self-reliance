@@ -4,10 +4,8 @@ import appeng.api.storage.ISubMenuHost;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
-import appeng.menu.implementations.InterfaceMenu;
+import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 /**
  * By Deepseek V4.1 Flash 1017
@@ -15,6 +13,9 @@ import net.minecraft.world.item.Items;
  * single menu type can drive either of them.
  */
 public interface EnergyInterfaceHost extends IUpgradeableObject, ISubMenuHost {
+
+    String VALUE_OUTPUT_RATE = "outputRate";
+    String VALUE_CAPACITY = "capacity";
 
     long getOutputRate();
 
@@ -37,32 +38,47 @@ public interface EnergyInterfaceHost extends IUpgradeableObject, ISubMenuHost {
 
     boolean isActive();
 
-    default Object getValue(String valueName) {
-        switch (valueName) {
-            case "outputRate" -> {
-                return getOutputRate();
-            }
-            case "capacity" -> {
-                return getEnergyCapacity();
-            }
+    /**
+     * @return whether the given identifier names a configurable value of this host.
+     */
+    default boolean hasValue(String valueName) {
+        return VALUE_OUTPUT_RATE.equals(valueName) || VALUE_CAPACITY.equals(valueName);
+    }
+
+    default long getValue(String valueName) {
+        if (VALUE_OUTPUT_RATE.equals(valueName)) {
+            return getOutputRate();
         }
-        return null;
+        if (VALUE_CAPACITY.equals(valueName)) {
+            return getEnergyCapacity();
+        }
+        return 0;
+    }
+
+    /**
+     * @return the highest value the given value may be set to.
+     */
+    default long getMaxValue(String valueName) {
+        if (VALUE_OUTPUT_RATE.equals(valueName)) {
+            return EnergyInterfaceLogic.MAX_OUTPUT_RATE;
+        }
+        if (VALUE_CAPACITY.equals(valueName)) {
+            return EnergyInterfaceLogic.MAX_CAPACITY;
+        }
+        return 0;
     }
 
     default void setValue(String valueName, long value) {
-        switch (valueName) {
-            case "outputRate" -> setOutputRate(value);
-            case "capacity" -> setCapacity(value);
+        if (VALUE_OUTPUT_RATE.equals(valueName)) {
+            setOutputRate(value);
+        } else if (VALUE_CAPACITY.equals(valueName)) {
+            setCapacity(value);
         }
     }
 
     @Override
     default void returnToMainMenu(Player player, ISubMenu subMenu) {
-        MenuOpener.returnTo(InterfaceMenu.TYPE, player, subMenu.getLocator());
-    }
-
-    @Override
-    default ItemStack getMainMenuIcon() {
-        return Items.AIR.getDefaultInstance();
+        // The main menu of this host is the Energy Interface menu, not AE2's interface menu.
+        MenuOpener.returnTo(ACIMenus.ENERGY_INTERFACE_MENU, player, subMenu.getLocator());
     }
 }

@@ -28,7 +28,7 @@ public final class ACIMenus {
 
     public static final MenuType<SetValueMenu> SET_VALUE_MENU = MenuTypeBuilder
             .create(SetValueMenu::new, EnergyInterfaceHost.class)
-            .build("set_value");
+            .build(id("set_value"));
 
 
     private ACIMenus() {

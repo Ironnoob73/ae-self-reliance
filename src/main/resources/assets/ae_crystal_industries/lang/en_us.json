@@ -11,5 +11,6 @@
   "gui.ae_crystal_industries.energy_interface.capacity": "Buffer: %s FE",
   "gui.ae_crystal_industries.energy_interface.stored": "Stored: %s FE",
   "gui.ae_crystal_industries.energy_interface.conversion": "Conversion: %s AE to 1 FE",
-  "gui.ae_crystal_industries.energy_interface.energy_cards": "Energy Cards: %s / 4"
+  "gui.ae_crystal_industries.energy_interface.energy_cards": "Energy Cards: %s / 4",
+  "gui.ae_crystal_industries.set_value": "Set Value"
 }

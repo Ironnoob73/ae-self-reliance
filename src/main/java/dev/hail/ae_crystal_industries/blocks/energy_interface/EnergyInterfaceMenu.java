@@ -2,7 +2,6 @@ package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
 import appeng.core.definitions.AEItems;
 import appeng.menu.guisync.GuiSync;
-import appeng.menu.implementations.SetStockAmountMenu;
 import appeng.menu.implementations.UpgradeableMenu;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
@@ -88,11 +87,13 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
     public void openSetValueMenu(String valueName) {
         if (isClientSide()) {
             sendClientAction(ACTION_SET_OUTPUT_VALUE, valueName);
-        } else {
-            Object value = getHost().getValue(valueName);
-            if (value != null) {
-                SetValueMenu.open((ServerPlayer) getPlayer(), getLocator(), valueName, (Long) value, Long.MAX_VALUE);
-            }
+            return;
+        }
+
+        var host = getHost();
+        if (host.hasValue(valueName)) {
+            SetValueMenu.open((ServerPlayer) getPlayer(), getLocator(), valueName,
+                    host.getValue(valueName), host.getMaxValue(valueName));
         }
     }
 }

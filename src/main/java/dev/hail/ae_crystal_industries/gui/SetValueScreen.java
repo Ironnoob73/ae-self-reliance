@@ -21,8 +21,8 @@ public class SetValueScreen extends AEBaseScreen<SetValueMenu> {
         widgets.addButton("save", GuiText.Set.text(), this::confirm);
         AESubScreen.addBackButton(menu, "back", widgets);
 
-        this.value = widgets.addNumberEntryWidget("value", NumberEntryType.ENERGY);
-        this.value.setLongValue(1);
+        // The configured values are plain FE amounts, so no unit scaling is applied and no AE unit is shown.
+        this.value = widgets.addNumberEntryWidget("value", NumberEntryType.UNITLESS);
         this.value.setTextFieldStyle(style.getWidget("valueSet"));
         this.value.setMinValue(0);
         this.value.setHideValidationIcon(true);
@@ -33,9 +33,11 @@ public class SetValueScreen extends AEBaseScreen<SetValueMenu> {
     protected void updateBeforeRender() {
         super.updateBeforeRender();
 
-        if (!this.valueInitialized) {
-            this.value.setLongValue(menu.getInitialValue());
+        // The value and its maximum are sent by the server right after the menu was opened. Only initialize the
+        // widget once they actually arrived, otherwise the defaults (-1) would be locked in.
+        if (!this.valueInitialized && menu.hasValue()) {
             this.value.setMaxValue(menu.getMaxValue());
+            this.value.setLongValue(menu.getInitialValue());
             this.valueInitialized = true;
         }
     }

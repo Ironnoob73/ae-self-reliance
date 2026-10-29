@@ -11,5 +11,6 @@
   "gui.ae_crystal_industries.energy_interface.capacity": "储能上限：%s FE",
   "gui.ae_crystal_industries.energy_interface.stored": "已存储：%s FE",
   "gui.ae_crystal_industries.energy_interface.conversion": "转化率：%s AE → 1 FE",
-  "gui.ae_crystal_industries.energy_interface.energy_cards": "能源卡：%s / 4"
+  "gui.ae_crystal_industries.energy_interface.energy_cards": "能源卡：%s / 4",
+  "gui.ae_crystal_industries.set_value": "设置数值"
 }
