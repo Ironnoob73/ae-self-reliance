@@ -1,4 +1,4 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGrid;
@@ -21,6 +21,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntity implements IGridTickable, IUpgradeableObject {
     private final IUpgradeInventory upgrades;
@@ -59,12 +61,17 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
      * light-opaque block, so the light engine reports 0 at its own position. The vanilla daylight
      * detector gets away with measuring its own position only because that block is transparent.
      */
-    private int getSkyLightLevel() {
+    public int getSkyLightLevel() {
         if (this.level == null || !this.level.dimensionType().hasSkyLight() || !this.level.canSeeSky(this.worldPosition.above())) {
             return 0;
         }
-        return Math.max(0,
-                this.level.getBrightness(LightLayer.SKY, this.worldPosition.above()) - this.level.getSkyDarken());
+
+        int i = this.level.getBrightness(LightLayer.SKY, this.worldPosition.above()) - this.level.getSkyDarken();
+        float f = level.getSunAngle(1.0F);
+        float f1 = f < (float)Math.PI ? 0.0F : ((float)Math.PI * 2F);
+        f += (f1 - f) * 0.2F;
+        i = Math.round((float)i * Mth.cos(f));
+        return Mth.clamp(i, 0, 15);
     }
 
     @Override
@@ -110,6 +117,10 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
     @Override
     public IUpgradeInventory getUpgrades() {
         return this.upgrades;
+    }
+
+    public double getEnergyPerTick(){
+        return getSkyLightLevel() * this.baseEnergyRate;
     }
 
     @Override

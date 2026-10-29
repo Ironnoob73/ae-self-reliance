@@ -2,35 +2,74 @@ package dev.hail.ae_crystal_industries.inits;
 
 import appeng.block.AEBaseEntityBlock;
 import appeng.blockentity.AEBaseBlockEntity;
-import appeng.core.definitions.BlockDefinition;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
-import dev.hail.ae_crystal_industries.blocks.SunlightResonanceGeneratorBlockEntity;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceBlockEntity;
+import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.pedroksl.ae2addonlib.registry.BlockEntityRegistry;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("unused")
-public final class ACIBlockEntities extends BlockEntityRegistry {
+public final class ACIBlockEntities {
 
-    public static final ACIBlockEntities INSTANCE = new ACIBlockEntities();
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister
+            .create(Registries.BLOCK_ENTITY_TYPE, AeCrystalIndustriesMod.MOD_ID);
 
-    ACIBlockEntities() {
-        super(AeCrystalIndustriesMod.MOD_ID);
-    }
-
-    public static final Supplier<BlockEntityType<SunlightResonanceGeneratorBlockEntity>> SUNLIGHT_RESONANCE_GENERATOR = create(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SunlightResonanceGeneratorBlockEntity>> SUNLIGHT_RESONANCE_GENERATOR = create(
             "sunlight_resonance_generator_entity",
             SunlightResonanceGeneratorBlockEntity.class,
             SunlightResonanceGeneratorBlockEntity::new,
             ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR);
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EnergyInterfaceBlockEntity>> ENERGY_INTERFACE = create(
+            "energy_interface_entity",
+            EnergyInterfaceBlockEntity.class,
+            EnergyInterfaceBlockEntity::new,
+            ACIBlocks.ENERGY_INTERFACE);
+
+    private ACIBlockEntities() {
+    }
+
+    public static void init() {
+    }
+
+    @FunctionalInterface
+    private interface BlockEntityFactory<T extends AEBaseBlockEntity> {
+        T create(BlockEntityType<T> type, BlockPos pos, BlockState state);
+    }
+
     @SafeVarargs
-    private static <T extends AEBaseBlockEntity> Supplier<BlockEntityType<T>> create(
+    private static <T extends AEBaseBlockEntity> DeferredHolder<BlockEntityType<?>, BlockEntityType<T>> create(
             String id,
             Class<T> entityClass,
             BlockEntityFactory<T> factory,
-            BlockDefinition<? extends AEBaseEntityBlock<?>>... blockDefs) {
-        return create(AeCrystalIndustriesMod.MOD_ID, id, entityClass, factory, blockDefs);
+            DeferredBlock<?>... blocks) {
+        return BLOCK_ENTITY_TYPES.register(id, () -> {
+            AtomicReference<BlockEntityType<T>> typeHolder = new AtomicReference<>();
+            Block[] registeredBlocks = Arrays.stream(blocks).map(DeferredBlock::get).toArray(Block[]::new);
+
+            BlockEntityType<T> type = BlockEntityType.Builder.of(
+                    (pos, state) -> factory.create(typeHolder.get(), pos, state),
+                    registeredBlocks).build(null);
+            typeHolder.set(type);
+
+            AEBaseBlockEntity.registerBlockEntityItem(type, registeredBlocks[0].asItem());
+
+            for (Block block : registeredBlocks) {
+                @SuppressWarnings("unchecked")
+                AEBaseEntityBlock<T> baseBlock = (AEBaseEntityBlock<T>) block;
+                baseBlock.setBlockEntity(entityClass, type, null, null);
+            }
+
+            return type;
+        });
     }
 }

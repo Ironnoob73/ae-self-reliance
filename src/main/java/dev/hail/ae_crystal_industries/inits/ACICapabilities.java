@@ -1,16 +1,13 @@
 package dev.hail.ae_crystal_industries.inits;
 
 import appeng.api.AECapabilities;
-import appeng.api.networking.IInWorldGridNodeHost;
+import appeng.api.parts.RegisterPartCapabilitiesEvent;
+import dev.hail.ae_crystal_industries.parts.EnergyInterfacePart;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 /**
- * Registers AE2 capabilities for this mod's block entities.
- * <p>
- * AE2 only registers its {@link AECapabilities#IN_WORLD_GRID_NODE_HOST} capability for its own block entity types.
- * Addon block entities must register it themselves, otherwise AE2 cannot discover their grid nodes when scanning from
- * a neighboring block: e.g. placing the generator first and then an AE2 cable / controller / cell next to it would
- * never connect, because the neighbor's node lookup goes through this capability.
+ * Registers AE2 and NeoForge capabilities for this mod's block entities and cable parts.
  */
 public final class ACICapabilities {
 
@@ -18,9 +15,24 @@ public final class ACICapabilities {
     }
 
     public static void register(RegisterCapabilitiesEvent event) {
-        for (var type : ACIBlockEntities.INSTANCE.getImplementorsOf(IInWorldGridNodeHost.class)) {
-            event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, type,
-                    (object, context) -> (IInWorldGridNodeHost) object);
-        }
+        // AE2 only registers this capability for its own block entities. Addons must do it themselves, otherwise
+        // AE2 cannot discover the grid node when it scans in from a neighboring cable/controller.
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ACIBlockEntities.SUNLIGHT_RESONANCE_GENERATOR.get(),
+                (blockEntity, side) -> blockEntity);
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ACIBlockEntities.ENERGY_INTERFACE.get(),
+                (blockEntity, side) -> blockEntity);
+
+        // The Energy Interface exposes its FE buffer on every side.
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                ACIBlockEntities.ENERGY_INTERFACE.get(),
+                (blockEntity, side) -> blockEntity.getEnergyStorage());
+    }
+
+    public static void registerPartCapabilities(RegisterPartCapabilitiesEvent event) {
+        event.register(Capabilities.EnergyStorage.BLOCK,
+                (part, side) -> part.getEnergyStorage(),
+                EnergyInterfacePart.class);
     }
 }

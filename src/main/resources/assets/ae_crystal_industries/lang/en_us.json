@@ -1,4 +1,14 @@
 {
   "tab.ae_crystal_industries": "Applied Energistics 2: Crystal Industries",
-  "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator"
+  "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "Skylight strength: %s",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
+  "block.ae_crystal_industries.energy_interface": "Energy Interface",
+  "item.ae_crystal_industries.energy_interface_part": "Energy Interface Panel",
+  "gui.ae_crystal_industries.energy_interface": "Energy Interface",
+  "gui.ae_crystal_industries.energy_interface.output_rate": "Rate: %s FE/t",
+  "gui.ae_crystal_industries.energy_interface.capacity": "Buffer: %s FE",
+  "gui.ae_crystal_industries.energy_interface.stored": "Stored: %s FE",
+  "gui.ae_crystal_industries.energy_interface.conversion": "Conversion: %s AE to 1 FE",
+  "gui.ae_crystal_industries.energy_interface.energy_cards": "Energy Cards: %s / 4"
 }

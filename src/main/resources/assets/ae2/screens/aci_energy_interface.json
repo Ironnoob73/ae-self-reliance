@@ -1,0 +1,49 @@
+{
+  "$schema": "schema.json",
+  "includes": [
+    "common/common.json",
+    "common/player_inventory.json",
+    "common/toolbox.json"
+  ],
+  "background": {
+    "texture": "guis/ae_crystal_industries/energy_interface.png",
+    "srcRect": [0, 0, 176, 210]
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "gui.ae_crystal_industries.energy_interface"
+      },
+      "position": {
+        "left": 8,
+        "top": 6
+      }
+    }
+  },
+  "widgets": {
+    "outputRateDown": {
+      "left": 138,
+      "top": 17,
+      "width": 16,
+      "height": 16
+    },
+    "outputRateUp": {
+      "left": 156,
+      "top": 17,
+      "width": 16,
+      "height": 16
+    },
+    "capacityDown": {
+      "left": 138,
+      "top": 37,
+      "width": 16,
+      "height": 16
+    },
+    "capacityUp": {
+      "left": 156,
+      "top": 37,
+      "width": 16,
+      "height": 16
+    }
+  }
+}

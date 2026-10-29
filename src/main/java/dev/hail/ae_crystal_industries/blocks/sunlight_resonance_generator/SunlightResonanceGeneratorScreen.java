@@ -1,9 +1,10 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator;
 
 import appeng.client.gui.implementations.UpgradeableScreen;
 import appeng.client.gui.style.Blitter;
 import appeng.client.gui.style.ScreenStyle;
 import appeng.client.gui.widgets.CommonButtons;
+import dev.hail.ae_crystal_industries.gui.IFormattedTextScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
@@ -11,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.LightLayer;
 
-public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<SunlightResonanceGeneratorMenu> {
+public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<SunlightResonanceGeneratorMenu> implements IFormattedTextScreen {
 
     private static final Blitter LIGHT_LEVEL = Blitter.texture("guis/ae_crystal_industries/sunlight_resonance_generator.png").src(176, 0, 20, 21);
 
@@ -38,12 +39,11 @@ public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<Sunlight
         if (pos != null && level.dimensionType().hasSkyLight()) {
             // Same measurement as the server-side generator: the block is opaque, so read the
             // sky light of the block above it (mirrors the vanilla daylight detector formula).
-            skyLight = Math.max(0,
-                    Math.min(15, level.getBrightness(LightLayer.SKY, pos.above()) - level.getSkyDarken()));
+            skyLight = Math.clamp(level.getBrightness(LightLayer.SKY, pos.above()) - level.getSkyDarken(), 0, 15);
         }
 
         // Height of the drawn bar, proportional to the current sky light level (0..15)
-        int f = LIGHT_LEVEL.getSrcHeight() * skyLight / 15;
+        int f = LIGHT_LEVEL.getSrcHeight() * menu.getSkylightLevel() / 15;
         if (f <= 0) {
             return;
         }
@@ -54,8 +54,16 @@ public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<Sunlight
                         LIGHT_LEVEL.getSrcY() + LIGHT_LEVEL.getSrcHeight() - f,
                         LIGHT_LEVEL.getSrcWidth(),
                         f)
-                .dest(78, 35 + LIGHT_LEVEL.getSrcHeight() - f)
+                .dest(20, 35 + LIGHT_LEVEL.getSrcHeight() - f)
                 .blit(guiGraphics);
-    }
 
+        guiGraphics.drawString(font,
+                Component.translatable("gui.ae_crystal_industries.sunlight_resonance_generator.skylight",
+                        IFormattedTextScreen.format(menu.getSkylightLevel())),
+                50, 36, textColor, false);
+        guiGraphics.drawString(font,
+                Component.translatable("gui.ae_crystal_industries.sunlight_resonance_generator.output_rate",
+                        IFormattedTextScreen.format(menu.getEnergyPerTick())),
+                50, 48, textColor, false);
+    }
 }

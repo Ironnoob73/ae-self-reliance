@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae_crystal_industries:energy_interface"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:energy_interface_part"
+  }
+}

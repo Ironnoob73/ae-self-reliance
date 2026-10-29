@@ -1,4 +1,4 @@
-package dev.hail.ae_crystal_industries.blocks;
+package dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator;
 
 import appeng.api.orientation.IOrientationStrategy;
 import appeng.block.AEBaseEntityBlock;
@@ -39,7 +39,7 @@ public class SunlightResonanceGeneratorBlock extends AEBaseEntityBlock<SunlightR
         BlockEntity var7 = level.getBlockEntity(pos);
         if (var7 instanceof SunlightResonanceGeneratorBlockEntity be) {
             if (!level.isClientSide) {
-                MenuOpener.open(ACIMenus.SUNLIGHT_RESONANCE_GENERATOR_MENU.get(), player, MenuLocators.forBlockEntity(be));
+                MenuOpener.open(ACIMenus.SUNLIGHT_RESONANCE_GENERATOR_MENU, player, MenuLocators.forBlockEntity(be));
             }
 
             return InteractionResult.sidedSuccess(level.isClientSide());

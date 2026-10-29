@@ -1,20 +1,33 @@
 package dev.hail.ae_crystal_industries.inits;
 
+import appeng.api.parts.PartModels;
+import appeng.items.parts.PartItem;
+import appeng.items.parts.PartModelsHelper;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
-import net.pedroksl.ae2addonlib.registry.ItemRegistry;
+import dev.hail.ae_crystal_industries.parts.EnergyInterfacePart;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Item registry of this mod, backed by AE2AddonLib.
- * <p>
- * This class MUST be initialized (its static {@link #INSTANCE} touched) before any block definition of this mod is
- * created, because AE2AddonLib's {@code BlockRegistry.block()} looks up the item deferred-register of the same mod id
- * when it registers the block item.
+ * Item registry of this mod.
  */
-public final class ACIItems extends ItemRegistry {
+public final class ACIItems {
 
-    public static final ACIItems INSTANCE = new ACIItems();
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(AeCrystalIndustriesMod.MOD_ID);
 
-    ACIItems() {
-        super(AeCrystalIndustriesMod.MOD_ID);
+    public static final DeferredItem<PartItem<EnergyInterfacePart>> ENERGY_INTERFACE_PART = ITEMS.register(
+            "energy_interface_part",
+            () -> new PartItem<>(new Item.Properties(), EnergyInterfacePart.class, EnergyInterfacePart::new));
+
+    private ACIItems() {
+    }
+
+    /**
+     * Called during mod construction, before item registration. Registers the cable part models early enough for AE2
+     * (the model set is frozen when the client registers additional models).
+     */
+    public static void init() {
+        PartModels.registerModels(PartModelsHelper.createModels(EnergyInterfacePart.class));
     }
 }

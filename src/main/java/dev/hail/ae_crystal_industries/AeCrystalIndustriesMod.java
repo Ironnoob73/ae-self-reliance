@@ -1,6 +1,8 @@
 package dev.hail.ae_crystal_industries;
 
 import com.mojang.logging.LogUtils;
+import appeng.api.upgrades.Upgrades;
+import appeng.core.definitions.AEItems;
 import dev.hail.ae_crystal_industries.inits.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -26,20 +28,25 @@ public class AeCrystalIndustriesMod {
 
         ACIConfig.register(modContainer);
 
-        // The item registry must be initialized before the block registry: ae2addonlib's
-        // BlockRegistry.block() looks up the item deferred-register of this mod id when it
-        // registers the block item, and throws if it does not exist yet.
-        ACIItems.INSTANCE.register(modEventBus);
-        ACIBlocks.INSTANCE.register(modEventBus);
-        ACIBlockEntities.INSTANCE.register(modEventBus);
-        ACIMenus.INSTANCE.register(modEventBus);
-        ACICreativeTab.INSTANCE.register(modEventBus);
+        // Register the content. The item registry has to be initialized first since the block registration adds
+        // the corresponding block items to it.
+        ACIItems.init();
+        ACIBlocks.init();
+        ACIBlockEntities.init();
+        ACIMenus.init();
+        ACICreativeTab.init();
+
+        ACIItems.ITEMS.register(modEventBus);
+        ACIBlocks.BLOCKS.register(modEventBus);
+        ACIBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
+        ACICreativeTab.CREATIVE_MODE_TABS.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
 
-        // Register AE2 capabilities for this mod's block entities (grid node host, ...).
+        // Register AE2 capabilities for this mod's block entities / parts (grid node host, FE output, ...).
         modEventBus.addListener(ACICapabilities::register);
+        modEventBus.addListener(ACICapabilities::registerPartCapabilities);
     }
 
     public static AeCrystalIndustriesMod instance() {
@@ -47,6 +54,11 @@ public class AeCrystalIndustriesMod {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            // Allow up to four AE2 Energy Cards in both forms. Each card reduces the AE cost per FE by one.
+            Upgrades.add(AEItems.ENERGY_CARD, ACIBlocks.ENERGY_INTERFACE.get(), 4);
+            Upgrades.add(AEItems.ENERGY_CARD, ACIItems.ENERGY_INTERFACE_PART.get(), 4);
+        });
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {

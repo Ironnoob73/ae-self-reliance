@@ -1,4 +1,14 @@
 {
   "tab.ae_crystal_industries": "应用能源2：水晶工业",
-  "block.ae_crystal_industries.sunlight_resonance_generator": "日光谐振发电机"
+  "block.ae_crystal_industries.sunlight_resonance_generator": "日光谐振发电机",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "天空光照强度：%s",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
+  "block.ae_crystal_industries.energy_interface": "能源接口",
+  "item.ae_crystal_industries.energy_interface_part": "能源接口面板",
+  "gui.ae_crystal_industries.energy_interface": "能源接口",
+  "gui.ae_crystal_industries.energy_interface.output_rate": "输出速率：%s FE/t",
+  "gui.ae_crystal_industries.energy_interface.capacity": "储能上限：%s FE",
+  "gui.ae_crystal_industries.energy_interface.stored": "已存储：%s FE",
+  "gui.ae_crystal_industries.energy_interface.conversion": "转化率：%s AE → 1 FE",
+  "gui.ae_crystal_industries.energy_interface.energy_cards": "能源卡：%s / 4"
 }
