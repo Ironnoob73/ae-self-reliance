@@ -16,6 +16,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * By Deepseek V4.1 Flash 1017
  * Shared AE-to-FE conversion logic of the Energy Interface block and cable part.
  * <p>
  * AE is drained from the grid and converted into FE at a ratio of {@code aePerFe : 1} (4:1 by default, reduced by one
@@ -66,7 +67,7 @@ public final class EnergyInterfaceLogic {
             if (maxExtract <= 0) {
                 return 0;
             }
-            int amount = (int) Math.min(Math.min((long) maxExtract, storedEnergy), Math.min(outputBudget,
+            int amount = (int) Math.min(Math.min(maxExtract, storedEnergy), Math.min(outputBudget,
                     Integer.MAX_VALUE));
             if (amount <= 0) {
                 return 0;
@@ -135,17 +136,25 @@ public final class EnergyInterfaceLogic {
         return Math.max(1, MAX_AE_PER_FE - upgrades.getInstalledUpgrades(AEItems.ENERGY_CARD));
     }
 
-    public void cycleOutputRate(int direction) {
+    public void cycleOutputRate(Long direction) {
         outputRate = nextStep(OUTPUT_RATE_STEPS, outputRate, direction);
         saveChanges.run();
     }
 
-    public void cycleEnergyCapacity(int direction) {
+    public void cycleEnergyCapacity(Long direction) {
         capacity = nextStep(CAPACITY_STEPS, capacity, direction);
         if (storedEnergy > capacity) {
             storedEnergy = capacity;
         }
         saveChanges.run();
+    }
+
+    public void setOutputRate(long value){
+        this.outputRate = value;
+    }
+
+    public void setCapacity(long value){
+        this.capacity = value;
     }
 
     /**
@@ -164,7 +173,7 @@ public final class EnergyInterfaceLogic {
         this.outputBudget = perTickBudget;
 
         long room = capacity - storedEnergy;
-        long targetFe = Math.min(perTickBudget, Math.max(0, room));
+        long targetFe = Math.clamp(room, 0, perTickBudget);
         long produced = 0;
 
         if (targetFe > 0) {
@@ -256,17 +265,15 @@ public final class EnergyInterfaceLogic {
 
     public void loadTag(CompoundTag tag) {
         if (tag.contains("output_rate")) {
-            outputRate = Math.max(0,
-                    Math.min(OUTPUT_RATE_STEPS[OUTPUT_RATE_STEPS.length - 1], tag.getLong("output_rate")));
+            outputRate = Math.clamp(tag.getLong("output_rate"), 0, OUTPUT_RATE_STEPS[OUTPUT_RATE_STEPS.length - 1]);
         }
         if (tag.contains("capacity")) {
-            capacity = Math.max(CAPACITY_STEPS[0],
-                    Math.min(CAPACITY_STEPS[CAPACITY_STEPS.length - 1], tag.getLong("capacity")));
+            capacity = Math.clamp(tag.getLong("capacity"), CAPACITY_STEPS[0], CAPACITY_STEPS[CAPACITY_STEPS.length - 1]);
         }
-        storedEnergy = Math.max(0, Math.min(capacity, tag.getLong("stored_energy")));
+        storedEnergy = Math.clamp(tag.getLong("stored_energy"), 0, capacity);
     }
 
-    private static long nextStep(long[] values, long current, int direction) {
+    private static long nextStep(long[] values, long current, long direction) {
         int index = 0;
         for (int i = 0; i < values.length; i++) {
             if (values[i] <= current) {

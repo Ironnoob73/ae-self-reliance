@@ -1,5 +1,6 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
+import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.ticking.IGridTickable;
 import appeng.api.networking.ticking.TickRateModulation;
@@ -7,14 +8,12 @@ import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
-import appeng.api.util.AECableType;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.core.settings.TickRates;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,6 +25,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.List;
 
+// Init By Deepseek V4.1 Flash 1017:
 public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
         implements IGridTickable, IUpgradeableObject, EnergyInterfaceHost {
 
@@ -34,17 +34,12 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
 
     public EnergyInterfaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
-        this.getMainNode().setIdlePowerUsage(0.0).setFlags();
+        this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
         this.upgrades = UpgradeInventories.forMachine(ACIBlocks.ENERGY_INTERFACE.get().asItem(), 4,
                 this::onUpgradesChanged);
         this.logic = new EnergyInterfaceLogic(this.getMainNode(), this.upgrades, this::saveChanges,
                 this::onActiveChanged);
         this.getMainNode().addService(IGridTickable.class, this);
-    }
-
-    @Override
-    public AECableType getCableConnectionType(Direction dir) {
-        return AECableType.COVERED;
     }
 
     public IEnergyStorage getEnergyStorage() {
@@ -123,7 +118,7 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
-    public void cycleOutputRate(int direction) {
+    public void cycleOutputRate(long direction) {
         this.logic.cycleOutputRate(direction);
     }
 
@@ -133,8 +128,18 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
-    public void cycleEnergyCapacity(int direction) {
+    public void setOutputRate(long value) {
+        this.logic.setOutputRate(value);
+    }
+
+    @Override
+    public void cycleEnergyCapacity(long direction) {
         this.logic.cycleEnergyCapacity(direction);
+    }
+
+    @Override
+    public void setCapacity(long value) {
+        this.logic.setCapacity(value);
     }
 
     @Override

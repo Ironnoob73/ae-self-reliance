@@ -1,5 +1,6 @@
 package dev.hail.ae_crystal_industries.parts;
 
+import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.ticking.IGridTickable;
 import appeng.api.networking.ticking.TickRateModulation;
@@ -37,7 +38,7 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     public EnergyInterfacePart(IPartItem<?> partItem) {
         super(partItem);
         // Like the Energy Acceptor, this device does not need a channel.
-        this.getMainNode().setIdlePowerUsage(0.0).setFlags();
+        this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
         this.logic = new EnergyInterfaceLogic(this.getMainNode(), this.getUpgrades(), this::saveChanges,
                 this::onActiveChanged);
         this.getMainNode().addService(IGridTickable.class, this);
@@ -111,8 +112,13 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     @Override
-    public void cycleOutputRate(int direction) {
+    public void cycleOutputRate(long direction) {
         this.logic.cycleOutputRate(direction);
+    }
+
+    @Override
+    public void setOutputRate(long value) {
+        this.logic.setOutputRate(value);
     }
 
     @Override
@@ -121,8 +127,13 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     @Override
-    public void cycleEnergyCapacity(int direction) {
+    public void cycleEnergyCapacity(long direction) {
         this.logic.cycleEnergyCapacity(direction);
+    }
+
+    @Override
+    public void setCapacity(long value) {
+        this.logic.setCapacity(value);
     }
 
     @Override

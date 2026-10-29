@@ -21,6 +21,12 @@
     }
   },
   "widgets": {
+    "setOutputRate": {
+      "left": 120,
+      "top": 17,
+      "width": 16,
+      "height": 16
+    },
     "outputRateDown": {
       "left": 138,
       "top": 17,

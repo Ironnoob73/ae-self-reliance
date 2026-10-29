@@ -6,6 +6,7 @@ import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceMen
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorBlockEntity;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorMenu;
 import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.gui.SetValueMenu;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 
@@ -24,6 +25,11 @@ public final class ACIMenus {
                     EnergyInterfaceMenu::new,
                     EnergyInterfaceHost.class)
             .build(id("energy_interface"));
+
+    public static final MenuType<SetValueMenu> SET_VALUE_MENU = MenuTypeBuilder
+            .create(SetValueMenu::new, EnergyInterfaceHost.class)
+            .build("set_value");
+
 
     private ACIMenus() {
     }

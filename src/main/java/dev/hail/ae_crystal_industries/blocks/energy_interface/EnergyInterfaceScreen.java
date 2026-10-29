@@ -14,6 +14,8 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
             ScreenStyle style) {
         super(menu, playerInventory, title, style);
 
+        this.widgets.addButton("setOutputRate", Component.literal("?"), () -> menu.openSetValueMenu("outputRate"));
+
         this.widgets.addButton("outputRateDown", Component.literal("<"), () -> menu.cycleOutputRate(-1));
         this.widgets.addButton("outputRateUp", Component.literal(">"), () -> menu.cycleOutputRate(1));
         this.widgets.addButton("capacityDown", Component.literal("<"), () -> menu.cycleEnergyCapacity(-1));

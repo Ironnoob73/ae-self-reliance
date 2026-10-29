@@ -3,6 +3,7 @@ package dev.hail.ae_crystal_industries.inits;
 import appeng.init.client.InitScreens;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceScreen;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorScreen;
+import dev.hail.ae_crystal_industries.gui.SetValueScreen;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 public class ACIScreens
@@ -17,5 +18,7 @@ public class ACIScreens
                 ACIMenus.ENERGY_INTERFACE_MENU,
                 EnergyInterfaceScreen::new,
                 "/screens/aci_energy_interface.json");
+
+        InitScreens.register(event, ACIMenus.SET_VALUE_MENU, SetValueScreen::new, "/screens/aci_set_value.json");
     }
 }
