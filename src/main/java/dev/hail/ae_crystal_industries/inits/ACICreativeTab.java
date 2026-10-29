@@ -15,7 +15,7 @@ public final class ACICreativeTab {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_MODE_TABS.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("tab.ae_crystal_industries"))
-                    .icon(() -> ACIBlocks.ENERGY_INTERFACE.get().asItem().getDefaultInstance())
+                    .icon(() -> ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get().asItem().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get());
                         output.accept(ACIBlocks.ENERGY_INTERFACE.get());

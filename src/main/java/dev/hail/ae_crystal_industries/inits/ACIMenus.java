@@ -20,8 +20,8 @@ public final class ACIMenus {
      * {@link MenuTypeBuilder#build(ResourceLocation)} through its own registration queue.
      */
     public static final MenuType<EnergyInterfaceMenu> ENERGY_INTERFACE_MENU = MenuTypeBuilder
-            .<EnergyInterfaceMenu, EnergyInterfaceHost>create(
-                    (type, id, inventory, host) -> new EnergyInterfaceMenu(type, id, inventory, host),
+            .create(
+                    EnergyInterfaceMenu::new,
                     EnergyInterfaceHost.class)
             .build(id("energy_interface"));
 

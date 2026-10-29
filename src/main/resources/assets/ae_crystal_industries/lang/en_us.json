@@ -3,6 +3,7 @@
   "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator",
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "Skylight strength: %s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.cant_see_sky": "The sky has been blocked",
   "block.ae_crystal_industries.energy_interface": "Energy Interface",
   "item.ae_crystal_industries.energy_interface_part": "Energy Interface Panel",
   "gui.ae_crystal_industries.energy_interface": "Energy Interface",

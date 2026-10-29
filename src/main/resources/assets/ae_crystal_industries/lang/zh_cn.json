@@ -3,6 +3,7 @@
   "block.ae_crystal_industries.sunlight_resonance_generator": "日光谐振发电机",
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "天空光照强度：%s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
+  "gui.ae_crystal_industries.sunlight_resonance_generator.cant_see_sky": "天空被阻挡",
   "block.ae_crystal_industries.energy_interface": "能源接口",
   "item.ae_crystal_industries.energy_interface_part": "能源接口面板",
   "gui.ae_crystal_industries.energy_interface": "能源接口",

@@ -29,15 +29,15 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.output_rate",
                         IFormattedTextScreen.format(menu.outputRate)),
-                8, 21, textColor, false);
+                8, 21, plainTextColor, false);
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.capacity",
                         IFormattedTextScreen.format(menu.energyCapacity)),
-                8, 41, textColor, false);
+                8, 41, plainTextColor, false);
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.stored",
                         IFormattedTextScreen.format(menu.storedEnergy)),
-                8, 61, textColor, false);
+                8, 61, plainTextColor, false);
 
         // Simple buffer fill bar.
         int barX = 8;
@@ -55,10 +55,10 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
 
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.conversion", menu.aePerFe),
-                8, 86, textColor, false);
+                8, 86, plainTextColor, false);
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.energy_cards",
                         menu.energyCards),
-                8, 98, textColor, false);
+                8, 98, plainTextColor, false);
     }
 }

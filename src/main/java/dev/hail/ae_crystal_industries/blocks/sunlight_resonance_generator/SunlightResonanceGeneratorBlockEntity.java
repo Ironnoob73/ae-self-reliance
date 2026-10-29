@@ -1,6 +1,8 @@
 package dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator;
 
 import appeng.api.config.Actionable;
+import appeng.api.inventories.ISegmentedInventory;
+import appeng.api.inventories.InternalInventory;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyService;
@@ -12,6 +14,7 @@ import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.api.util.AECableType;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
+import appeng.core.definitions.AEItems;
 import appeng.core.settings.TickRates;
 import appeng.util.Platform;
 import dev.hail.ae_crystal_industries.ACIConfig;
@@ -21,12 +24,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +79,13 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
         return Mth.clamp(i, 0, 15);
     }
 
+    public boolean canSeeSky() {
+        if (this.level != null) {
+            return this.level.canSeeSky(this.worldPosition.above());
+        }
+        return false;
+    }
+
     @Override
     protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         boolean changed = super.readFromStream(data);
@@ -119,8 +131,18 @@ public class SunlightResonanceGeneratorBlockEntity extends AENetworkedBlockEntit
         return this.upgrades;
     }
 
+    @Nullable
+    @Override
+    public InternalInventory getSubInventory(ResourceLocation id) {
+        if (id.equals(ISegmentedInventory.UPGRADES)) {
+            return this.upgrades;
+        }
+
+        return super.getSubInventory(id);
+    }
+
     public double getEnergyPerTick(){
-        return getSkyLightLevel() * this.baseEnergyRate;
+        return getSkyLightLevel() * this.baseEnergyRate * (1 + this.upgrades.getInstalledUpgrades(AEItems.ENERGY_CARD) / 2.0f);
     }
 
     @Override

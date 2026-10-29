@@ -54,11 +54,7 @@ public class AeCrystalIndustriesMod {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            // Allow up to four AE2 Energy Cards in both forms. Each card reduces the AE cost per FE by one.
-            Upgrades.add(AEItems.ENERGY_CARD, ACIBlocks.ENERGY_INTERFACE.get(), 4);
-            Upgrades.add(AEItems.ENERGY_CARD, ACIItems.ENERGY_INTERFACE_PART.get(), 4);
-        });
+        ACIUpgrades.addUpgradesForBlocks(event);
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {

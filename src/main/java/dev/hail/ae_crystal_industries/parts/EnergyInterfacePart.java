@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
+// Init By Deepseek V4.1 Flash 1017:
 public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterfaceHost, IGridTickable {
 
     @PartModels

@@ -4,13 +4,11 @@ import appeng.client.gui.implementations.UpgradeableScreen;
 import appeng.client.gui.style.Blitter;
 import appeng.client.gui.style.ScreenStyle;
 import appeng.client.gui.widgets.CommonButtons;
+import appeng.util.Platform;
 import dev.hail.ae_crystal_industries.gui.IFormattedTextScreen;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.LightLayer;
 
 public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<SunlightResonanceGeneratorMenu> implements IFormattedTextScreen {
 
@@ -29,24 +27,20 @@ public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<Sunlight
     @Override
     public void drawFG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX,
                        int mouseY) {
-        var level = Minecraft.getInstance().level;
-        if (level == null) {
+        if (!menu.canSeeSky) {
+            guiGraphics.drawString(font,
+                    Component.translatable("gui.ae_crystal_industries.sunlight_resonance_generator.cant_see_sky"),
+                    50, 41, errorTextColor, true);
             return;
         }
 
-        BlockPos pos = menu.getBlockEntity() != null ? menu.getBlockEntity().getBlockPos() : null;
-        int skyLight = 0;
-        if (pos != null && level.dimensionType().hasSkyLight()) {
-            // Same measurement as the server-side generator: the block is opaque, so read the
-            // sky light of the block above it (mirrors the vanilla daylight detector formula).
-            skyLight = Math.clamp(level.getBrightness(LightLayer.SKY, pos.above()) - level.getSkyDarken(), 0, 15);
-        }
+        // By Deepseek V4.1 Flash 1017:
+        // Both values are measured on the server (see SunlightResonanceGeneratorMenu#broadcastChanges):
+        // the client level's getSkyDarken() is not reliable, so the light level must not be
+        // recalculated here.
 
         // Height of the drawn bar, proportional to the current sky light level (0..15)
         int f = LIGHT_LEVEL.getSrcHeight() * menu.getSkylightLevel() / 15;
-        if (f <= 0) {
-            return;
-        }
 
         LIGHT_LEVEL.copy()
                 .src(
@@ -60,10 +54,8 @@ public class SunlightResonanceGeneratorScreen extends UpgradeableScreen<Sunlight
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.sunlight_resonance_generator.skylight",
                         IFormattedTextScreen.format(menu.getSkylightLevel())),
-                50, 36, textColor, false);
-        guiGraphics.drawString(font,
-                Component.translatable("gui.ae_crystal_industries.sunlight_resonance_generator.output_rate",
-                        IFormattedTextScreen.format(menu.getEnergyPerTick())),
-                50, 48, textColor, false);
+                50, 36, plainTextColor, false);
+        guiGraphics.drawString(font, Platform.formatPower(menu.getEnergyPerTick(), true),
+                50, 48, plainTextColor, false);
     }
 }
