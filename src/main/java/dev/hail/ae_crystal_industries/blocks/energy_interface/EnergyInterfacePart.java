@@ -1,4 +1,4 @@
-package dev.hail.ae_crystal_industries.parts;
+package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
@@ -16,8 +16,8 @@ import appeng.menu.locator.MenuLocators;
 import appeng.parts.PartModel;
 import appeng.parts.automation.UpgradeablePart;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import dev.hail.ae_crystal_industries.inits.ACIItems;
 import net.minecraft.core.HolderLookup;
@@ -41,12 +41,12 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
         super(partItem);
         // Like the Energy Acceptor, this device does not need a channel.
         this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
-        this.logic = new EnergyInterfaceLogic(this.getMainNode(), this.getUpgrades(), this::saveChanges,
+        this.logic = new EnergyInterfaceLogic(this.getMainNode(), this, this.getUpgrades(), this::saveChanges,
                 this::onActiveChanged);
         this.getMainNode().addService(IGridTickable.class, this);
     }
 
-    private void saveChanges() {
+    public void saveChanges() {
         this.getHost().markForSave();
     }
 
@@ -114,7 +114,7 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     @Override
-    public void cycleOutputRate(long direction) {
+    public void cycleOutputRate(int direction) {
         this.logic.cycleOutputRate(direction);
     }
 
@@ -129,7 +129,7 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     @Override
-    public void cycleEnergyCapacity(long direction) {
+    public void cycleEnergyCapacity(int direction) {
         this.logic.cycleEnergyCapacity(direction);
     }
 
@@ -141,6 +141,11 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     @Override
     public long getStoredEnergy() {
         return this.logic.getStoredEnergy();
+    }
+
+    @Override
+    public EnergyInterfaceLogic getInterfaceLogic() {
+        return this.logic;
     }
 
     @Override

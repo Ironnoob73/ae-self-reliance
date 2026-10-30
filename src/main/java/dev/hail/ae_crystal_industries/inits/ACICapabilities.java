@@ -2,7 +2,7 @@ package dev.hail.ae_crystal_industries.inits;
 
 import appeng.api.AECapabilities;
 import appeng.api.parts.RegisterPartCapabilitiesEvent;
-import dev.hail.ae_crystal_industries.parts.EnergyInterfacePart;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfacePart;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 

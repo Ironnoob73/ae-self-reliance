@@ -5,7 +5,7 @@ import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceMenu;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorBlockEntity;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorMenu;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.gui.SetValueMenu;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;

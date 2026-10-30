@@ -10,8 +10,10 @@ import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.core.settings.TickRates;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
+import appeng.helpers.IPriorityHost;
+import appeng.helpers.InterfaceLogic;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -27,7 +29,7 @@ import java.util.List;
 
 // Init By Deepseek V4.1 Flash 1017:
 public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
-        implements IGridTickable, IUpgradeableObject, EnergyInterfaceHost {
+        implements IPriorityHost, IGridTickable, IUpgradeableObject, EnergyInterfaceHost {
 
     private final IUpgradeInventory upgrades;
     private final EnergyInterfaceLogic logic;
@@ -37,7 +39,7 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
         this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
         this.upgrades = UpgradeInventories.forMachine(ACIBlocks.ENERGY_INTERFACE.get().asItem(), 4,
                 this::onUpgradesChanged);
-        this.logic = new EnergyInterfaceLogic(this.getMainNode(), this.upgrades, this::saveChanges,
+        this.logic = new EnergyInterfaceLogic(this.getMainNode(), this, this.upgrades, this::saveChanges,
                 this::onActiveChanged);
         this.getMainNode().addService(IGridTickable.class, this);
     }
@@ -118,7 +120,7 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
-    public void cycleOutputRate(long direction) {
+    public void cycleOutputRate(int direction) {
         this.logic.cycleOutputRate(direction);
     }
 
@@ -133,7 +135,7 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
-    public void cycleEnergyCapacity(long direction) {
+    public void cycleEnergyCapacity(int direction) {
         this.logic.cycleEnergyCapacity(direction);
     }
 
@@ -145,6 +147,11 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     @Override
     public long getStoredEnergy() {
         return this.logic.getStoredEnergy();
+    }
+
+    @Override
+    public EnergyInterfaceLogic getInterfaceLogic() {
+        return this.logic;
     }
 
     @Override

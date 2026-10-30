@@ -4,7 +4,7 @@ import appeng.api.parts.PartModels;
 import appeng.items.parts.PartItem;
 import appeng.items.parts.PartModelsHelper;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
-import dev.hail.ae_crystal_industries.parts.EnergyInterfacePart;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfacePart;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;

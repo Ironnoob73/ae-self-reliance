@@ -6,7 +6,7 @@ import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.locator.MenuHostLocator;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;

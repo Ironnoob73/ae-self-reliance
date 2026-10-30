@@ -1,7 +1,7 @@
-package dev.hail.ae_crystal_industries.energy;
+package dev.hail.ae_crystal_industries.blocks.energy_interface.logic;
 
-import appeng.api.storage.ISubMenuHost;
 import appeng.api.upgrades.IUpgradeableObject;
+import appeng.helpers.IPriorityHost;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import dev.hail.ae_crystal_industries.inits.ACIMenus;
@@ -12,20 +12,22 @@ import net.minecraft.world.entity.player.Player;
  * Common interface implemented by both forms of the Energy Interface (the block entity and the cable part), so that a
  * single menu type can drive either of them.
  */
-public interface EnergyInterfaceHost extends IUpgradeableObject, ISubMenuHost {
+public interface EnergyInterfaceHost extends IUpgradeableObject, IPriorityHost {
 
     String VALUE_OUTPUT_RATE = "outputRate";
     String VALUE_CAPACITY = "capacity";
 
+    EnergyInterfaceLogic getInterfaceLogic();
+
     long getOutputRate();
 
-    void cycleOutputRate(long direction);
+    void cycleOutputRate(int direction);
 
     void setOutputRate(long value);
 
     long getEnergyCapacity();
 
-    void cycleEnergyCapacity(long direction);
+    void cycleEnergyCapacity(int direction);
 
     void setCapacity(long value);
 
@@ -37,6 +39,8 @@ public interface EnergyInterfaceHost extends IUpgradeableObject, ISubMenuHost {
     int getAePerFe();
 
     boolean isActive();
+
+    void saveChanges();
 
     /**
      * @return whether the given identifier names a configurable value of this host.
@@ -74,6 +78,16 @@ public interface EnergyInterfaceHost extends IUpgradeableObject, ISubMenuHost {
         } else if (VALUE_CAPACITY.equals(valueName)) {
             setCapacity(value);
         }
+    }
+
+    @Override
+    default int getPriority() {
+        return getInterfaceLogic().getPriority();
+    }
+
+    @Override
+    default void setPriority(int newValue) {
+        getInterfaceLogic().setPriority(newValue);
     }
 
     @Override

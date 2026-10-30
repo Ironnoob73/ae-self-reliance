@@ -3,8 +3,8 @@ package dev.hail.ae_crystal_industries.blocks.energy_interface;
 import appeng.core.definitions.AEItems;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.implementations.UpgradeableMenu;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceHost;
-import dev.hail.ae_crystal_industries.energy.EnergyInterfaceLogic;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
+import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.gui.SetValueMenu;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,7 +15,7 @@ import net.minecraft.world.inventory.MenuType;
  */
 public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
 
-    public static final String ACTION_SET_OUTPUT_VALUE = "setOutputValue";
+    public static final String ACTION_SET_VALUE = "setValue";
     private static final String ACTION_CYCLE_OUTPUT_RATE = "cycleOutputRate";
     private static final String ACTION_CYCLE_CAPACITY = "cycleEnergyCapacity";
 
@@ -37,12 +37,12 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
     public EnergyInterfaceMenu(MenuType<EnergyInterfaceMenu> menuType, int id, Inventory playerInventory,
             EnergyInterfaceHost host) {
         super(menuType, id, playerInventory, host);
-        registerClientAction(ACTION_SET_OUTPUT_VALUE, String.class, this::openSetValueMenu);
-        registerClientAction(ACTION_CYCLE_OUTPUT_RATE, Long.class, this::handleCycleOutputRate);
-        registerClientAction(ACTION_CYCLE_CAPACITY, Long.class, this::handleCycleCapacity);
+        registerClientAction(ACTION_SET_VALUE, String.class, this::openSetValueMenu);
+        registerClientAction(ACTION_CYCLE_OUTPUT_RATE, Integer.class, this::handleCycleOutputRate);
+        registerClientAction(ACTION_CYCLE_CAPACITY, Integer.class, this::handleCycleCapacity);
     }
 
-    public void cycleOutputRate(long direction) {
+    public void cycleOutputRate(int direction) {
         if (isClientSide()) {
             sendClientAction(ACTION_CYCLE_OUTPUT_RATE, direction);
         } else {
@@ -50,7 +50,7 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
         }
     }
 
-    public void cycleEnergyCapacity(long direction) {
+    public void cycleEnergyCapacity(int direction) {
         if (isClientSide()) {
             sendClientAction(ACTION_CYCLE_CAPACITY, direction);
         } else {
@@ -58,12 +58,12 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
         }
     }
 
-    private void handleCycleOutputRate(long direction) {
+    private void handleCycleOutputRate(int direction) {
         getHost().cycleOutputRate(direction);
         syncFromHost();
     }
 
-    private void handleCycleCapacity(long direction) {
+    private void handleCycleCapacity(int direction) {
         getHost().cycleEnergyCapacity(direction);
         syncFromHost();
     }
@@ -86,7 +86,7 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
 
     public void openSetValueMenu(String valueName) {
         if (isClientSide()) {
-            sendClientAction(ACTION_SET_OUTPUT_VALUE, valueName);
+            sendClientAction(ACTION_SET_VALUE, valueName);
             return;
         }
 

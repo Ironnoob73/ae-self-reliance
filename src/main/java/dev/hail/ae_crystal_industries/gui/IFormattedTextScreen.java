@@ -1,5 +1,8 @@
 package dev.hail.ae_crystal_industries.gui;
 
+import appeng.client.gui.Icon;
+import appeng.client.gui.widgets.IconButton;
+
 import java.awt.*;
 import java.util.Locale;
 
@@ -14,5 +17,17 @@ public interface IFormattedTextScreen {
 
     static String format(double value) {
         return String.format(Locale.ROOT, "%s", value);
+    }
+
+    class SetAmountButton extends IconButton {
+        public SetAmountButton(OnPress onPress) {
+            super(onPress);
+            setDisableBackground(true);
+        }
+
+        @Override
+        protected Icon getIcon() {
+            return isHoveredOrFocused() ? Icon.COG : Icon.COG_DISABLED;
+        }
     }
 }

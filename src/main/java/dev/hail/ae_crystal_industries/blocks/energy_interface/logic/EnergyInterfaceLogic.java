@@ -1,10 +1,13 @@
-package dev.hail.ae_crystal_industries.energy;
+package dev.hail.ae_crystal_industries.blocks.energy_interface.logic;
 
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
 import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.energy.IEnergyService;
+import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.core.definitions.AEItems;
 import net.minecraft.core.BlockPos;
@@ -14,6 +17,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.OptionalInt;
 
 /**
  * By Deepseek V4.1 Flash 1017
@@ -43,6 +48,7 @@ public final class EnergyInterfaceLogic {
     public static final long MIN_CAPACITY = CAPACITY_STEPS[0];
     public static final long MAX_CAPACITY = CAPACITY_STEPS[CAPACITY_STEPS.length - 1];
 
+    private final EnergyInterfaceHost host;
     private final IManagedGridNode mainNode;
     private final IUpgradeInventory upgrades;
     private final Runnable saveChanges;
@@ -52,6 +58,7 @@ public final class EnergyInterfaceLogic {
     private long outputRate = DEFAULT_OUTPUT_RATE;
     private long capacity = DEFAULT_CAPACITY;
     private boolean active;
+    private int priority;
     /**
      * FE that may still leave the buffer during the current tick interval. It is shared between the machine's own
      * push into adjacent receivers and direct extraction through the exposed {@link IEnergyStorage}, so external
@@ -105,8 +112,9 @@ public final class EnergyInterfaceLogic {
         }
     };
 
-    public EnergyInterfaceLogic(IManagedGridNode mainNode, IUpgradeInventory upgrades,
+    public EnergyInterfaceLogic(IManagedGridNode mainNode, EnergyInterfaceHost host, IUpgradeInventory upgrades,
             Runnable saveChanges, Runnable onActiveChanged) {
+        this.host = host;
         this.mainNode = mainNode;
         this.upgrades = upgrades;
         this.saveChanges = saveChanges;
@@ -140,12 +148,12 @@ public final class EnergyInterfaceLogic {
         return Math.max(1, MAX_AE_PER_FE - upgrades.getInstalledUpgrades(AEItems.ENERGY_CARD));
     }
 
-    public void cycleOutputRate(Long direction) {
+    public void cycleOutputRate(int direction) {
         outputRate = nextStep(OUTPUT_RATE_STEPS, outputRate, direction);
         saveChanges.run();
     }
 
-    public void cycleEnergyCapacity(Long direction) {
+    public void cycleEnergyCapacity(int direction) {
         capacity = nextStep(CAPACITY_STEPS, capacity, direction);
         if (storedEnergy > capacity) {
             storedEnergy = capacity;
@@ -228,6 +236,11 @@ public final class EnergyInterfaceLogic {
     }
 
     private long pushEnergy(Level level, BlockPos pos, @Nullable Direction side, long budget) {
+        /*var requestPriority = getRequestInterfacePriority(source);
+        if (requestPriority.isPresent() && requestPriority.getAsInt() <= getPriority() && isSameGrid(source)) {
+            return 0;
+        }*/
+
         long available = Math.min(Math.min(budget, storedEnergy), outputBudget);
         if (available <= 0) {
             return 0;
@@ -274,10 +287,20 @@ public final class EnergyInterfaceLogic {
         return amount - accepted;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+        this.host.saveChanges();
+    }
+
     public void saveTag(CompoundTag tag) {
         tag.putLong("output_rate", outputRate);
         tag.putLong("capacity", capacity);
         tag.putLong("stored_energy", storedEnergy);
+        tag.putInt("priority", this.priority);
     }
 
     public void loadTag(CompoundTag tag) {
@@ -315,5 +338,22 @@ public final class EnergyInterfaceLogic {
             return Long.MAX_VALUE;
         }
         return value * multiplier;
+    }
+
+    private final OptionalInt getRequestInterfacePriority(IActionSource src) {
+        return src.context(EnergyInterfaceLogic.InterfaceRequestContext.class)
+                .map(ctx -> OptionalInt.of(ctx.getPriority()))
+                .orElseGet(OptionalInt::empty);
+    }
+
+    private final boolean isSameGrid(IActionSource src) {
+        var otherGrid = src.machine().map(IActionHost::getActionableNode).map(IGridNode::getGrid).orElse(null);
+        return otherGrid == mainNode.getGrid();
+    }
+
+    private class InterfaceRequestContext {
+        public int getPriority() {
+            return priority;
+        }
     }
 }
