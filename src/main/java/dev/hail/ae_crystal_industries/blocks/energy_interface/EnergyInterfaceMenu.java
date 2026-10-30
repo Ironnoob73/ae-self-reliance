@@ -1,5 +1,6 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
+import appeng.api.util.IConfigManager;
 import appeng.core.definitions.AEItems;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.implementations.UpgradeableMenu;
@@ -82,6 +83,18 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
             syncFromHost();
         }
         super.broadcastChanges();
+    }
+
+    /**
+     * By Deepseek V4.1 Flash 1017:
+     * The Energy Interface does not expose any of the fuzzy/redstone settings AE2's {@link UpgradeableMenu} loads by
+     * default. This matters for the cable-part form: {@code UpgradeablePart} implements {@code IConfigurableObject},
+     * and the base implementation would ask its config manager for unsupported settings, making the menu fail to open
+     * with an {@code UnsupportedSettingException}.
+     */
+    @Override
+    protected void loadSettingsFromHost(IConfigManager configManager) {
+        // Intentionally empty: there are no configurable settings in this menu.
     }
 
     public void openSetValueMenu(String valueName) {

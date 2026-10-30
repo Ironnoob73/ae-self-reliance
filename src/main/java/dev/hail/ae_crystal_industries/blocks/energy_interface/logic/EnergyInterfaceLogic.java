@@ -6,8 +6,6 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.energy.IEnergyService;
-import appeng.api.networking.security.IActionHost;
-import appeng.api.networking.security.IActionSource;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.core.definitions.AEItems;
 import net.minecraft.core.BlockPos;
@@ -17,8 +15,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.OptionalInt;
 
 /**
  * By Deepseek V4.1 Flash 1017
@@ -201,23 +197,24 @@ public final class EnergyInterfaceLogic {
         long targetFe = Math.clamp(room, 0, perTickBudget);
         long produced = 0;
 
-        if (targetFe > 0) {
-            IGrid grid = mainNode.getGrid();
-            if (grid != null) {
-                IEnergyService energy = grid.getEnergyService();
-                int aePerFe = getAePerFe();
-                double neededAe = targetFe * (double) aePerFe;
+        // Priority function by Deepseek V4.1 Flash 1017
+        IGrid grid = mainNode.getGrid();
+        // Interfaces with a higher priority are filled first. While any of them still has room in its buffer and is
+        // able to charge, this interface must not take AE away from it.
+        if (targetFe > 0 && grid != null && !isOutrankedByChargingInterface(grid)) {
+            IEnergyService energy = grid.getEnergyService();
+            int aePerFe = getAePerFe();
+            double neededAe = targetFe * (double) aePerFe;
 
-                // Only extract if at least one whole FE can be produced, so no AE is wasted on partial conversions.
-                double availableAe = energy.extractAEPower(neededAe, Actionable.SIMULATE, PowerMultiplier.ONE);
-                long feasibleFe = (long) Math.floor(availableAe / aePerFe + 1.0E-9);
-                if (feasibleFe > 0) {
-                    double extractedAe = energy.extractAEPower(feasibleFe * (double) aePerFe,
-                            Actionable.MODULATE, PowerMultiplier.ONE);
-                    produced = (long) Math.floor(extractedAe / aePerFe + 1.0E-9);
-                    if (produced > 0) {
-                        storedEnergy = Math.min(capacity, storedEnergy + produced);
-                    }
+            // Only extract if at least one whole FE can be produced, so no AE is wasted on partial conversions.
+            double availableAe = energy.extractAEPower(neededAe, Actionable.SIMULATE, PowerMultiplier.ONE);
+            long feasibleFe = (long) Math.floor(availableAe / aePerFe + 1.0E-9);
+            if (feasibleFe > 0) {
+                double extractedAe = energy.extractAEPower(feasibleFe * (double) aePerFe,
+                        Actionable.MODULATE, PowerMultiplier.ONE);
+                produced = (long) Math.floor(extractedAe / aePerFe + 1.0E-9);
+                if (produced > 0) {
+                    storedEnergy = Math.min(capacity, storedEnergy + produced);
                 }
             }
         }
@@ -235,12 +232,40 @@ public final class EnergyInterfaceLogic {
         }
     }
 
-    private long pushEnergy(Level level, BlockPos pos, @Nullable Direction side, long budget) {
-        /*var requestPriority = getRequestInterfacePriority(source);
-        if (requestPriority.isPresent() && requestPriority.getAsInt() <= getPriority() && isSameGrid(source)) {
-            return 0;
-        }*/
+    /**
+     * By Deepseek V4.1 Flash 1017:
+     * Checks whether another interface on this grid has a higher priority and is still waiting to be charged.
+     * <p>
+     * The interfaces are ticked independently by AE2's tick manager, so they consult each other instead of relying on a
+     * particular tick order. The higher-priority interface may then consume AE as usual, while this interface only
+     * pushes the FE it already buffered. Once the higher-priority buffer is full (or the interface is disabled), this
+     * interface starts charging as well.
+     */
+    private boolean isOutrankedByChargingInterface(IGrid grid) {
+        for (IGridNode node : grid.getNodes()) {
+            if (node.getOwner() instanceof EnergyInterfaceHost otherHost) {
+                EnergyInterfaceLogic other = otherHost.getInterfaceLogic();
+                if (other != null && other != this
+                        && other.priority > priority
+                        && other.wantsToCharge()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    /**
+     * By Deepseek V4.1 Flash 1017:
+     * @return true if this interface can still consume AE into its buffer during the next tick.
+     */
+    private boolean wantsToCharge() {
+        // An interface with a disabled output rate never produces FE, so it must not starve lower priorities
+        // forever. Likewise, an inactive node (no power/channel or an unloaded chunk) cannot consume AE right now.
+        return outputRate > 0 && storedEnergy < capacity && mainNode.isActive();
+    }
+
+    private long pushEnergy(Level level, BlockPos pos, @Nullable Direction side, long budget) {
         long available = Math.min(Math.min(budget, storedEnergy), outputBudget);
         if (available <= 0) {
             return 0;
@@ -310,6 +335,7 @@ public final class EnergyInterfaceLogic {
         if (tag.contains("capacity")) {
             capacity = Math.clamp(tag.getLong("capacity"), CAPACITY_STEPS[0], CAPACITY_STEPS[CAPACITY_STEPS.length - 1]);
         }
+        priority = tag.getInt("priority");
         storedEnergy = Math.clamp(tag.getLong("stored_energy"), 0, capacity);
     }
 
@@ -338,22 +364,5 @@ public final class EnergyInterfaceLogic {
             return Long.MAX_VALUE;
         }
         return value * multiplier;
-    }
-
-    private final OptionalInt getRequestInterfacePriority(IActionSource src) {
-        return src.context(EnergyInterfaceLogic.InterfaceRequestContext.class)
-                .map(ctx -> OptionalInt.of(ctx.getPriority()))
-                .orElseGet(OptionalInt::empty);
-    }
-
-    private final boolean isSameGrid(IActionSource src) {
-        var otherGrid = src.machine().map(IActionHost::getActionableNode).map(IGridNode::getGrid).orElse(null);
-        return otherGrid == mainNode.getGrid();
-    }
-
-    private class InterfaceRequestContext {
-        public int getPriority() {
-            return priority;
-        }
     }
 }
