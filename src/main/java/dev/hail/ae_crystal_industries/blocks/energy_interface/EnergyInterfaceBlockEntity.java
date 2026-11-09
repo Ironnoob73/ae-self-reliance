@@ -46,14 +46,15 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
                 this::onUpgradesChanged);
         this.logic = new EnergyInterfaceLogic(this.getMainNode(), this, this.upgrades, this::saveChanges,
                 this::onActiveChanged);
-        this.manager = IConfigManager.builder(this::updateTask)
+        this.manager = IConfigManager.builder(this::onConfigChanged)
                 .registerSetting(Settings.REDSTONE_CONTROLLED, RedstoneMode.IGNORE)
                 .build();
         this.getMainNode().addService(IGridTickable.class, this);
     }
 
     private boolean isInPulseMode() {
-        return getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED) == RedstoneMode.SIGNAL_PULSE;
+        return this.upgrades.isInstalled(AEItems.REDSTONE_CARD)
+                && getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED) == RedstoneMode.SIGNAL_PULSE;
     }
 
     public IEnergyStorage getEnergyStorage() {
@@ -62,6 +63,8 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
 
     private void onUpgradesChanged() {
         saveChanges();
+        // Adding or removing a redstone card changes whether redstone control applies.
+        updateTask();
     }
 
     private void onActiveChanged() {
@@ -129,17 +132,35 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
 
     @Override
     public TickingRequest getTickingRequest(IGridNode node) {
-        return new TickingRequest(TickRates.Charger, false);
+        final boolean sleeping = isSleeping();
+        // The node may have been removed from the grid for a while (chunk reload, network change), so the next
+        // tick must not catch up on that idle time.
+        this.logic.suppressCatchUp();
+        // Keep the shared logic's state in sync when the node is (re)added to a grid.
+        this.logic.setRunning(!sleeping);
+        return new TickingRequest(TickRates.Charger, sleeping);
     }
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
-        if (!this.isActive()) {
+        if (isSleeping()) {
+            this.logic.setRunning(false);
             return TickRateModulation.SLEEP;
         }
+
+        // Stay awake while the grid is inactive so the interface resumes on its own once power/channel returns.
+        // Sleeping here would require an external wake-up that might never happen.
+        if (!this.getMainNode().isActive()) {
+            return TickRateModulation.IDLE;
+        }
+
+        this.logic.setRunning(true);
+
         var blockEntity = getBlockEntity();
         if (blockEntity != null && blockEntity.getLevel() != null && !blockEntity.getLevel().isClientSide()) {
-            this.logic.tick(this.level, this.worldPosition, null, ticksSinceLastCall);
+            // A redstone pulse performs exactly one tick of work, no matter how long the interface slept before it.
+            int effectiveTicks = isInPulseMode() && this.logic.pendingPulse ? 1 : ticksSinceLastCall;
+            this.logic.tick(blockEntity.getLevel(), blockEntity.getBlockPos(), null, effectiveTicks);
         }
         this.logic.pendingPulse = false;
         return TickRateModulation.SAME;
@@ -195,61 +216,84 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
         return this.logic.getAePerFe();
     }
 
+    private void onConfigChanged() {
+        this.logic.pendingPulse = false;
+        if (isInPulseMode()) {
+            // Remember the current signal level, so that switching into pulse mode does not treat an already
+            // powered input as a fresh pulse.
+            this.logic.lastRedstone = getRedstoneState();
+        }
+        updateTask();
+    }
+
     private void updateTask() {
+        final boolean sleeping = isSleeping();
+        this.logic.setRunning(!sleeping);
+
         getMainNode().ifPresent((grid, node) -> {
-            if (this.isEnabled()) {
-                grid.getTickManager().wakeDevice(node);
-            } else {
+            if (sleeping) {
                 grid.getTickManager().sleepDevice(node);
+            } else {
+                grid.getTickManager().wakeDevice(node);
             }
         });
     }
 
     public void updateRedstoneState() {
-        if (!this.isInPulseMode()) {
+        if (this.level == null || this.level.isClientSide) {
+            return;
+        }
+
+        final boolean powered = getRedstoneState();
+
+        if (isInPulseMode()) {
+            if (this.logic.lastRedstone != powered) {
+                this.logic.lastRedstone = powered;
+                if (powered && !this.logic.pendingPulse) {
+                    // Perform exactly one tick of work for this pulse.
+                    this.logic.pendingPulse = true;
+                    this.logic.setRunning(true);
+                    getMainNode().ifPresent((grid, node) -> grid.getTickManager().alertDevice(node));
+                }
+            }
+        } else {
+            this.logic.lastRedstone = powered;
             this.logic.pendingPulse = false;
         }
 
-        getMainNode().ifPresent((grid, node) -> {
-            if (!this.isActive()) {
-                grid.getTickManager().wakeDevice(node);
-            } else {
-                grid.getTickManager().sleepDevice(node);
-            }
-        });
-
-        /*
-        final boolean currentState;
-        if (this.level != null) {
-            currentState = this.level.getBestNeighborSignal(this.worldPosition) != 0;
-            if (this.logic.lastRedstone != currentState) {
-                this.logic.lastRedstone = currentState;
-                this.updateTask();
-            }
-        }*/
+        updateTask();
     }
 
     private boolean getRedstoneState() {
-        return this.logic.lastRedstone;
+        if (this.level == null) {
+            return false;
+        }
+        return this.level.getBestNeighborSignal(this.worldPosition) != 0;
     }
 
-    private boolean isEnabled() {
-        if (!upgrades.isInstalled(AEItems.REDSTONE_CARD)) {
-            return true;
+    /**
+     * @return true if redstone control currently prevents the interface from running.
+     */
+    private boolean isSleeping() {
+        if (isInPulseMode() && this.logic.pendingPulse) {
+            return false;
         }
 
-        final RedstoneMode rs = getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED);
-        if (rs == RedstoneMode.HIGH_SIGNAL) {
-            return this.getRedstoneState();
+        if (!this.upgrades.isInstalled(AEItems.REDSTONE_CARD)) {
+            return false;
         }
-        return !this.getRedstoneState();
+
+        return switch (this.getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED)) {
+            case IGNORE -> false;
+            case HIGH_SIGNAL -> !this.getRedstoneState();
+            case LOW_SIGNAL -> this.getRedstoneState();
+            case SIGNAL_PULSE -> true;
+        };
     }
 
     @Override
     public boolean isActive() {
-        if (isInPulseMode() && this.logic.pendingPulse) {
-            return false;
-        } else if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide) {
             return this.getMainNode().isOnline();
         } else {
             return this.isActive;

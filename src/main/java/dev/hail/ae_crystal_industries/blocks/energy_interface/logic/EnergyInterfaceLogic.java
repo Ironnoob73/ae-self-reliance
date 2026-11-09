@@ -62,6 +62,18 @@ public final class EnergyInterfaceLogic {
      */
     private long outputBudget;
 
+    /**
+     * Whether the host currently allows this interface to work. It is set to {@code false} while redstone control
+     * disables the interface (or while it is otherwise asleep), so that other interfaces can take over the AE
+     * conversion instead of waiting for a buffer that will never be filled.
+     */
+    private boolean running = true;
+    /**
+     * Set when the interface stops working. The next {@link #tick} then only processes a single tick instead of
+     * converting the whole idle time into one large burst of FE.
+     */
+    private boolean catchUpSuppressed = true;
+
     public boolean lastRedstone = false;
     public boolean pendingPulse = false;
 
@@ -141,6 +153,33 @@ public final class EnergyInterfaceLogic {
     }
 
     /**
+     * Called by the host whenever its tick loop starts or stops, e.g. when redstone control disables the interface or
+     * when it wakes up again.
+     * <p>
+     * Stopping the interface discards the remaining output allowance and marks the elapsed time as "not worked", so
+     * that re-enabling it does not immediately convert AE into a burst of FE for the time it was disabled.
+     */
+    public void setRunning(boolean running) {
+        if (this.running == running) {
+            return;
+        }
+        this.running = running;
+        if (!running) {
+            suppressCatchUp();
+        }
+    }
+
+    /**
+     * Marks the next tick as the first one after the interface stopped working. This also discards the remaining
+     * output allowance, so buffered FE cannot be extracted by external cables while redstone control is disabling the
+     * interface.
+     */
+    public void suppressCatchUp() {
+        this.catchUpSuppressed = true;
+        this.outputBudget = 0;
+    }
+
+    /**
      * @return AE consumed per FE produced, reduced by one for every installed AE2 Energy Card (to a minimum of 1).
      */
     public int getAePerFe() {
@@ -188,8 +227,15 @@ public final class EnergyInterfaceLogic {
      * @param ticks      how many game ticks passed since the previous call
      */
     public void tick(Level level, BlockPos pos, @Nullable Direction outputSide, int ticks) {
-        if (level == null || level.isClientSide() || ticks <= 0) {
+        if (level == null || level.isClientSide() || ticks <= 0 || !running) {
             return;
+        }
+
+        if (this.catchUpSuppressed) {
+            // The interface was not working on its previous tick (redstone control, pulse mode, no channel/power,
+            // chunk unload, ...). Do not convert the time it spent idle into FE; process a single tick instead.
+            ticks = 1;
+            this.catchUpSuppressed = false;
         }
 
         long before = storedEnergy;
@@ -263,9 +309,11 @@ public final class EnergyInterfaceLogic {
      * @return true if this interface can still consume AE into its buffer during the next tick.
      */
     private boolean wantsToCharge() {
-        // An interface with a disabled output rate never produces FE, so it must not starve lower priorities
-        // forever. Likewise, an inactive node (no power/channel or an unloaded chunk) cannot consume AE right now.
-        return outputRate > 0 && storedEnergy < capacity && mainNode.isActive();
+        // An interface that was disabled by redstone (or is otherwise not running) must not outrank lower
+        // priorities: it cannot consume AE right now and would otherwise stall the whole grid forever.
+        // An interface with a disabled output rate never produces FE either. Likewise, an inactive node (no
+        // power/channel or an unloaded chunk) cannot consume AE right now.
+        return running && outputRate > 0 && storedEnergy < capacity && mainNode.isActive();
     }
 
     private long pushEnergy(Level level, BlockPos pos, @Nullable Direction side, long budget) {

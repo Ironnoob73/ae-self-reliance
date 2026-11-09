@@ -12,6 +12,7 @@ import appeng.api.parts.IPartModel;
 import appeng.api.util.AECableType;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigManagerBuilder;
+import appeng.core.definitions.AEItems;
 import appeng.core.settings.TickRates;
 import appeng.items.parts.PartModels;
 import appeng.menu.MenuOpener;
@@ -64,7 +65,8 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     private boolean isInPulseMode() {
-        return getRSMode() == RedstoneMode.SIGNAL_PULSE;
+        return this.getUpgrades().isInstalled(AEItems.REDSTONE_CARD)
+                && getRSMode() == RedstoneMode.SIGNAL_PULSE;
     }
 
     public void saveChanges() {
@@ -105,17 +107,29 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
 
     @Override
     public TickingRequest getTickingRequest(IGridNode node) {
-        return new TickingRequest(TickRates.Charger, false);
+        final boolean sleeping = isSleeping();
+        // The node may have been removed from the grid for a while (chunk reload, network change), so the next
+        // tick must not catch up on that idle time.
+        this.logic.suppressCatchUp();
+        // Keep the shared logic's state in sync when the node is (re)added to a grid.
+        this.logic.setRunning(!sleeping);
+        return new TickingRequest(TickRates.Charger, sleeping);
     }
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
         if (isSleeping()) {
+            this.logic.setRunning(false);
             return TickRateModulation.SLEEP;
         }
+
+        this.logic.setRunning(true);
+
         var blockEntity = getBlockEntity();
         if (blockEntity != null && blockEntity.getLevel() != null && !blockEntity.getLevel().isClientSide()) {
-            this.logic.tick(blockEntity.getLevel(), blockEntity.getBlockPos(), getSide(), ticksSinceLastCall);
+            // A redstone pulse performs exactly one tick of work, no matter how long the interface slept before it.
+            int effectiveTicks = isInPulseMode() && this.logic.pendingPulse ? 1 : ticksSinceLastCall;
+            this.logic.tick(blockEntity.getLevel(), blockEntity.getBlockPos(), getSide(), effectiveTicks);
         }
         this.logic.pendingPulse = false;
         return TickRateModulation.SAME;
@@ -137,8 +151,17 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
         updateRedstoneState();
 
         if (isInPulseMode()) {
+            // Switching into pulse mode must not treat an already powered input as a fresh pulse.
+            this.logic.pendingPulse = false;
             this.logic.lastRedstone = getHost().hasRedstone();
         }
+    }
+
+    @Override
+    public void upgradesChanged() {
+        super.upgradesChanged();
+        // Adding or removing a redstone card changes whether redstone control applies.
+        updateRedstoneState();
     }
 
     private void updateRedstoneState() {
@@ -146,11 +169,14 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
             this.logic.pendingPulse = false;
         }
 
+        final boolean sleeping = isSleeping();
+        this.logic.setRunning(!sleeping);
+
         getMainNode().ifPresent((grid, node) -> {
-            if (!this.isSleeping()) {
-                grid.getTickManager().wakeDevice(node);
-            } else {
+            if (sleeping) {
                 grid.getTickManager().sleepDevice(node);
+            } else {
+                grid.getTickManager().wakeDevice(node);
             }
         });
     }
@@ -178,13 +204,16 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
             if (this.logic.lastRedstone != hostIsPowered) {
                 this.logic.lastRedstone = hostIsPowered;
                 if (this.logic.lastRedstone && !this.logic.pendingPulse) {
+                    // Perform exactly one tick of work for this pulse.
                     this.logic.pendingPulse = true;
+                    this.logic.setRunning(true);
                     getMainNode().ifPresent((grid, node) -> grid.getTickManager().alertDevice(node));
                 }
             }
-        } else {
-            updateRedstoneState();
         }
+
+        // Also put the part back to sleep on a falling edge (pulse mode) and keep the shared running state in sync.
+        updateRedstoneState();
     }
 
     @Override
