@@ -1,5 +1,6 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
+import appeng.api.config.*;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.ticking.IGridTickable;
@@ -8,10 +9,11 @@ import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
+import appeng.api.util.IConfigManager;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
+import appeng.core.definitions.AEItems;
 import appeng.core.settings.TickRates;
 import appeng.helpers.IPriorityHost;
-import appeng.helpers.InterfaceLogic;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceHost;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIBlocks;
@@ -34,6 +36,9 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     private final IUpgradeInventory upgrades;
     private final EnergyInterfaceLogic logic;
 
+    private final IConfigManager manager;
+    private boolean isActive = false;
+
     public EnergyInterfaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
         this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
@@ -41,7 +46,14 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
                 this::onUpgradesChanged);
         this.logic = new EnergyInterfaceLogic(this.getMainNode(), this, this.upgrades, this::saveChanges,
                 this::onActiveChanged);
+        this.manager = IConfigManager.builder(this::updateTask)
+                .registerSetting(Settings.REDSTONE_CONTROLLED, RedstoneMode.IGNORE)
+                .build();
         this.getMainNode().addService(IGridTickable.class, this);
+    }
+
+    private boolean isInPulseMode() {
+        return getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED) == RedstoneMode.SIGNAL_PULSE;
     }
 
     public IEnergyStorage getEnergyStorage() {
@@ -58,17 +70,25 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
 
     @Override
     protected boolean readFromStream(RegistryFriendlyByteBuf data) {
-        return super.readFromStream(data);
+        boolean ret = super.readFromStream(data);
+
+        final boolean isActive = data.readBoolean();
+        ret = isActive != this.isActive || ret;
+        this.isActive = isActive;
+
+        return ret;
     }
 
     @Override
     protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
+        data.writeBoolean(this.isActive());
     }
 
     @Override
     public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
         super.saveAdditional(data, registries);
+        this.manager.writeToNBT(data, registries);
         this.upgrades.writeToNBT(data, "upgrades", registries);
         this.logic.saveTag(data);
     }
@@ -76,6 +96,7 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     @Override
     public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
         super.loadTag(data, registries);
+        this.manager.readFromNBT(data, registries);
         this.upgrades.readFromNBT(data, "upgrades", registries);
         this.logic.loadTag(data);
     }
@@ -97,6 +118,11 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
+    public IConfigManager getConfigManager() {
+        return this.manager;
+    }
+
+    @Override
     public IUpgradeInventory getUpgrades() {
         return this.upgrades;
     }
@@ -108,9 +134,14 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
-        if (this.level != null) {
+        if (!this.isActive()) {
+            return TickRateModulation.SLEEP;
+        }
+        var blockEntity = getBlockEntity();
+        if (blockEntity != null && blockEntity.getLevel() != null && !blockEntity.getLevel().isClientSide()) {
             this.logic.tick(this.level, this.worldPosition, null, ticksSinceLastCall);
         }
+        this.logic.pendingPulse = false;
         return TickRateModulation.SAME;
     }
 
@@ -164,8 +195,65 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
         return this.logic.getAePerFe();
     }
 
+    private void updateTask() {
+        getMainNode().ifPresent((grid, node) -> {
+            if (this.isEnabled()) {
+                grid.getTickManager().wakeDevice(node);
+            } else {
+                grid.getTickManager().sleepDevice(node);
+            }
+        });
+    }
+
+    public void updateRedstoneState() {
+        if (!this.isInPulseMode()) {
+            this.logic.pendingPulse = false;
+        }
+
+        getMainNode().ifPresent((grid, node) -> {
+            if (!this.isActive()) {
+                grid.getTickManager().wakeDevice(node);
+            } else {
+                grid.getTickManager().sleepDevice(node);
+            }
+        });
+
+        /*
+        final boolean currentState;
+        if (this.level != null) {
+            currentState = this.level.getBestNeighborSignal(this.worldPosition) != 0;
+            if (this.logic.lastRedstone != currentState) {
+                this.logic.lastRedstone = currentState;
+                this.updateTask();
+            }
+        }*/
+    }
+
+    private boolean getRedstoneState() {
+        return this.logic.lastRedstone;
+    }
+
+    private boolean isEnabled() {
+        if (!upgrades.isInstalled(AEItems.REDSTONE_CARD)) {
+            return true;
+        }
+
+        final RedstoneMode rs = getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED);
+        if (rs == RedstoneMode.HIGH_SIGNAL) {
+            return this.getRedstoneState();
+        }
+        return !this.getRedstoneState();
+    }
+
     @Override
     public boolean isActive() {
-        return true;
+        if (isInPulseMode() && this.logic.pendingPulse) {
+            return false;
+        } else if (level != null && !level.isClientSide) {
+            return this.getMainNode().isOnline();
+        } else {
+            return this.isActive;
+        }
     }
+
 }

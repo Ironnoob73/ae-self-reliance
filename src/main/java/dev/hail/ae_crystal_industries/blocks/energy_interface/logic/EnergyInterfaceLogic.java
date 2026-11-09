@@ -62,6 +62,9 @@ public final class EnergyInterfaceLogic {
      */
     private long outputBudget;
 
+    public boolean lastRedstone = false;
+    public boolean pendingPulse = false;
+
     private final IEnergyStorage energyStorage = new IEnergyStorage() {
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
@@ -365,4 +368,5 @@ public final class EnergyInterfaceLogic {
         }
         return value * multiplier;
     }
+
 }

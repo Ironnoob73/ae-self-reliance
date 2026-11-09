@@ -1,7 +1,12 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
+import appeng.api.config.RedstoneMode;
+import appeng.api.config.Settings;
 import appeng.client.gui.implementations.UpgradeableScreen;
 import appeng.client.gui.style.ScreenStyle;
+import appeng.client.gui.widgets.ServerSettingToggleButton;
+import appeng.client.gui.widgets.SettingToggleButton;
+import appeng.core.definitions.AEItems;
 import dev.hail.ae_crystal_industries.gui.IFormattedTextScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,11 +15,17 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu> implements IFormattedTextScreen {
 
+    private final SettingToggleButton<RedstoneMode> redstoneMode;
+
     public EnergyInterfaceScreen(EnergyInterfaceMenu menu, Inventory playerInventory, Component title,
             ScreenStyle style) {
         super(menu, playerInventory, title, style);
 
         widgets.addOpenPriorityButton();
+
+        this.redstoneMode = new ServerSettingToggleButton<>(
+                Settings.REDSTONE_CONTROLLED, RedstoneMode.IGNORE);
+        addToLeftToolbar(this.redstoneMode);
 
         this.widgets.add("setOutputRate", new SetAmountButton(btn -> menu.openSetValueMenu("outputRate")));
         this.widgets.add("setCapacity", new SetAmountButton(btn -> menu.openSetValueMenu("capacity")));
@@ -23,6 +34,14 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
         this.widgets.addButton("outputRateUp", Component.literal(">"), () -> menu.cycleOutputRate(1));
         this.widgets.addButton("capacityDown", Component.literal("<"), () -> menu.cycleEnergyCapacity(-1));
         this.widgets.addButton("capacityUp", Component.literal(">"), () -> menu.cycleEnergyCapacity(1));
+    }
+
+    @Override
+    protected void updateBeforeRender() {
+        super.updateBeforeRender();
+
+        this.redstoneMode.set(this.menu.getRedStoneMode());
+        this.redstoneMode.setVisibility(menu.hasUpgrade(AEItems.REDSTONE_CARD));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface.logic;
 
 import appeng.api.upgrades.IUpgradeableObject;
+import appeng.api.util.IConfigurableObject;
 import appeng.helpers.IPriorityHost;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
  * Common interface implemented by both forms of the Energy Interface (the block entity and the cable part), so that a
  * single menu type can drive either of them.
  */
-public interface EnergyInterfaceHost extends IUpgradeableObject, IPriorityHost {
+public interface EnergyInterfaceHost extends IUpgradeableObject, IPriorityHost, IConfigurableObject {
 
     String VALUE_OUTPUT_RATE = "outputRate";
     String VALUE_CAPACITY = "capacity";

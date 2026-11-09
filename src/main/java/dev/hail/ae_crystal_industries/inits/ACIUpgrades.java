@@ -10,8 +10,10 @@ public class ACIUpgrades {
             Upgrades.add(AEItems.ENERGY_CARD, ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get(), 4);
 
             // Allow up to four AE2 Energy Cards in both forms. Each card reduces the AE cost per FE by one.
-            Upgrades.add(AEItems.ENERGY_CARD, ACIBlocks.ENERGY_INTERFACE.get(), 4);
-            Upgrades.add(AEItems.ENERGY_CARD, ACIItems.ENERGY_INTERFACE_PART.get(), 4);
+            Upgrades.add(AEItems.ENERGY_CARD, ACIBlocks.ENERGY_INTERFACE.get(), 3);
+            Upgrades.add(AEItems.REDSTONE_CARD, ACIBlocks.ENERGY_INTERFACE.get(), 1);
+            Upgrades.add(AEItems.ENERGY_CARD, ACIItems.ENERGY_INTERFACE_PART.get(), 3);
+            Upgrades.add(AEItems.REDSTONE_CARD, ACIItems.ENERGY_INTERFACE_PART.get(), 1);
         });
     }
 }

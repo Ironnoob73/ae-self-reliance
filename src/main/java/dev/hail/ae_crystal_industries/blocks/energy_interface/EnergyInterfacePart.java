@@ -1,5 +1,6 @@
 package dev.hail.ae_crystal_industries.blocks.energy_interface;
 
+import appeng.api.config.*;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.ticking.IGridTickable;
@@ -9,6 +10,8 @@ import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
 import appeng.api.util.AECableType;
+import appeng.api.util.IConfigManager;
+import appeng.api.util.IConfigManagerBuilder;
 import appeng.core.settings.TickRates;
 import appeng.items.parts.PartModels;
 import appeng.menu.MenuOpener;
@@ -20,11 +23,13 @@ import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterf
 import dev.hail.ae_crystal_industries.blocks.energy_interface.logic.EnergyInterfaceLogic;
 import dev.hail.ae_crystal_industries.inits.ACIMenus;
 import dev.hail.ae_crystal_industries.inits.ACIItems;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -40,10 +45,26 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     public EnergyInterfacePart(IPartItem<?> partItem) {
         super(partItem);
         // Like the Energy Acceptor, this device does not need a channel.
+        // By LD_Anvil: Actually it need...
         this.getMainNode().setIdlePowerUsage(0.0).setFlags(GridFlags.REQUIRE_CHANNEL);
         this.logic = new EnergyInterfaceLogic(this.getMainNode(), this, this.getUpgrades(), this::saveChanges,
                 this::onActiveChanged);
         this.getMainNode().addService(IGridTickable.class, this);
+    }
+
+    @Override
+    protected void registerSettings(IConfigManagerBuilder builder) {
+        super.registerSettings(builder);
+        builder.registerSetting(Settings.REDSTONE_CONTROLLED, RedstoneMode.IGNORE);
+    }
+
+    @Override
+    public RedstoneMode getRSMode() {
+        return this.getConfigManager().getSetting(Settings.REDSTONE_CONTROLLED);
+    }
+
+    private boolean isInPulseMode() {
+        return getRSMode() == RedstoneMode.SIGNAL_PULSE;
     }
 
     public void saveChanges() {
@@ -89,23 +110,81 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        if (isSleeping()) {
+            return TickRateModulation.SLEEP;
+        }
         var blockEntity = getBlockEntity();
         if (blockEntity != null && blockEntity.getLevel() != null && !blockEntity.getLevel().isClientSide()) {
             this.logic.tick(blockEntity.getLevel(), blockEntity.getBlockPos(), getSide(), ticksSinceLastCall);
         }
+        this.logic.pendingPulse = false;
         return TickRateModulation.SAME;
+    }
+
+    @Override
+    protected boolean isSleeping() {
+        if (isInPulseMode() && this.logic.pendingPulse) {
+            return false;
+        } else {
+            return super.isSleeping();
+        }
+    }
+
+    @Override
+    protected void onSettingChanged(IConfigManager manager, Setting<?> setting) {
+        super.onSettingChanged(manager, setting);
+
+        updateRedstoneState();
+
+        if (isInPulseMode()) {
+            this.logic.lastRedstone = getHost().hasRedstone();
+        }
+    }
+
+    private void updateRedstoneState() {
+        if (!this.isInPulseMode()) {
+            this.logic.pendingPulse = false;
+        }
+
+        getMainNode().ifPresent((grid, node) -> {
+            if (!this.isSleeping()) {
+                grid.getTickManager().wakeDevice(node);
+            } else {
+                grid.getTickManager().sleepDevice(node);
+            }
+        });
     }
 
     @Override
     public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
         super.readFromNBT(data, registries);
         this.logic.loadTag(data);
+        logic.pendingPulse = isInPulseMode() && data.getBoolean("pendingPulse");
     }
 
     @Override
     public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
         super.writeToNBT(data, registries);
         this.logic.saveTag(data);
+        if (isInPulseMode() && logic.pendingPulse) {
+            data.putBoolean("pendingPulse", true);
+        }
+    }
+
+    @Override
+    public void onNeighborChanged(BlockGetter level, BlockPos pos, BlockPos neighbor) {
+        if (isInPulseMode()) {
+            var hostIsPowered = this.getHost().hasRedstone();
+            if (this.logic.lastRedstone != hostIsPowered) {
+                this.logic.lastRedstone = hostIsPowered;
+                if (this.logic.lastRedstone && !this.logic.pendingPulse) {
+                    this.logic.pendingPulse = true;
+                    getMainNode().ifPresent((grid, node) -> grid.getTickManager().alertDevice(node));
+                }
+            }
+        } else {
+            updateRedstoneState();
+        }
     }
 
     @Override
@@ -161,5 +240,14 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     @Override
     public boolean isActive() {
         return this.logic.isActive();
+    }
+
+    @Override
+    public void addToWorld() {
+        super.addToWorld();
+        this.logic.lastRedstone = this.getHost().hasRedstone();
+        if (this.logic.pendingPulse) {
+            getMainNode().ifPresent((grid, node) -> grid.getTickManager().alertDevice(node));
+        }
     }
 }

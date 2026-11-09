@@ -15,6 +15,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public class EnergyInterfaceBlock extends AEBaseEntityBlock<EnergyInterfaceBlockEntity> {
 
     public EnergyInterfaceBlock() {
@@ -24,6 +27,15 @@ public class EnergyInterfaceBlock extends AEBaseEntityBlock<EnergyInterfaceBlock
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos,
+                                boolean isMoving) {
+        final EnergyInterfaceBlockEntity te = this.getBlockEntity(level, pos);
+        if (te != null) {
+            te.updateRedstoneState();
+        }
     }
 
     @Override
