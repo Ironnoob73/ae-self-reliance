@@ -4,18 +4,25 @@ import appeng.api.config.RedstoneMode;
 import appeng.api.config.Settings;
 import appeng.client.gui.implementations.UpgradeableScreen;
 import appeng.client.gui.style.ScreenStyle;
+import appeng.client.gui.widgets.AE2Button;
 import appeng.client.gui.widgets.ServerSettingToggleButton;
 import appeng.client.gui.widgets.SettingToggleButton;
 import appeng.core.definitions.AEItems;
 import dev.hail.ae_crystal_industries.gui.IFormattedTextScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu> implements IFormattedTextScreen {
 
     private final SettingToggleButton<RedstoneMode> redstoneMode;
+
+    private final AE2Button setOutputRateDownButton;
+    private final AE2Button setOutputRateUpButton;
+    private final AE2Button setCapacityDownButton;
+    private final AE2Button setCapacityUpButton;
 
     public EnergyInterfaceScreen(EnergyInterfaceMenu menu, Inventory playerInventory, Component title,
             ScreenStyle style) {
@@ -30,10 +37,10 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
         this.widgets.add("setOutputRate", new SetAmountButton(btn -> menu.openSetValueMenu("outputRate")));
         this.widgets.add("setCapacity", new SetAmountButton(btn -> menu.openSetValueMenu("capacity")));
 
-        this.widgets.addButton("outputRateDown", Component.literal("<"), () -> menu.cycleOutputRate(-1));
-        this.widgets.addButton("outputRateUp", Component.literal(">"), () -> menu.cycleOutputRate(1));
-        this.widgets.addButton("capacityDown", Component.literal("<"), () -> menu.cycleEnergyCapacity(-1));
-        this.widgets.addButton("capacityUp", Component.literal(">"), () -> menu.cycleEnergyCapacity(1));
+        setOutputRateDownButton = this.widgets.addButton("outputRateDown", Component.literal("<"), () -> menu.cycleOutputRate(-1));
+        setOutputRateUpButton = this.widgets.addButton("outputRateUp", Component.literal(">"), () -> menu.cycleOutputRate(1));
+        setCapacityDownButton = this.widgets.addButton("capacityDown", Component.literal("<"), () -> menu.cycleEnergyCapacity(-1));
+        setCapacityUpButton = this.widgets.addButton("capacityUp", Component.literal(">"), () -> menu.cycleEnergyCapacity(1));
     }
 
     @Override
@@ -63,6 +70,11 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
                         IFormattedTextScreen.format(menu.storedEnergy)),
                 8, 61, plainTextColor, false);
 
+        setOutputRateDownButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextOutputRateDown))));
+        setOutputRateUpButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextOutputRateUp))));
+        setCapacityDownButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextCapacityDown))));
+        setCapacityUpButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextCapacityUp))));
+
         // Simple buffer fill bar.
         int barX = 8;
         int barY = 72;
@@ -80,9 +92,6 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.conversion", menu.aePerFe),
                 8, 86, plainTextColor, false);
-        guiGraphics.drawString(font,
-                Component.translatable("gui.ae_crystal_industries.energy_interface.energy_cards",
-                        menu.energyCards),
-                8, 98, plainTextColor, false);
+
     }
 }

@@ -36,6 +36,18 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
     @GuiSync(14)
     public int energyCards;
 
+    @GuiSync(15)
+    public long nextOutputRateDown;
+
+    @GuiSync(16)
+    public long nextOutputRateUp;
+
+    @GuiSync(17)
+    public long nextCapacityDown;
+
+    @GuiSync(18)
+    public long nextCapacityUp;
+
     public EnergyInterfaceMenu(MenuType<EnergyInterfaceMenu> menuType, int id, Inventory playerInventory,
             EnergyInterfaceHost host) {
         super(menuType, id, playerInventory, host);
@@ -76,6 +88,10 @@ public class EnergyInterfaceMenu extends UpgradeableMenu<EnergyInterfaceHost> {
         this.storedEnergy = getHost().getStoredEnergy();
         this.aePerFe = getHost().getAePerFe();
         this.energyCards = getHost().getUpgrades().getInstalledUpgrades(AEItems.ENERGY_CARD);
+        this.nextOutputRateDown = getHost().getNextOutputRate(-1);
+        this.nextOutputRateUp = getHost().getNextOutputRate(1);
+        this.nextCapacityDown = getHost().getNextCapacity(-1);
+        this.nextCapacityUp = getHost().getNextCapacity(1);
     }
 
     @Override

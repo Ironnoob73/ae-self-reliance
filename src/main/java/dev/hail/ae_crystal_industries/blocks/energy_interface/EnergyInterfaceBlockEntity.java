@@ -177,8 +177,8 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
-    public long getEnergyCapacity() {
-        return this.logic.getEnergyCapacity();
+    public long getNextOutputRate(int direction) {
+        return this.logic.getNextOutputRate(direction);
     }
 
     @Override
@@ -187,8 +187,18 @@ public class EnergyInterfaceBlockEntity extends AENetworkedBlockEntity
     }
 
     @Override
+    public long getEnergyCapacity() {
+        return this.logic.getEnergyCapacity();
+    }
+
+    @Override
     public void cycleEnergyCapacity(int direction) {
         this.logic.cycleEnergyCapacity(direction);
+    }
+
+    @Override
+    public long getNextCapacity(int direction) {
+        return this.logic.getNextCapacity(direction);
     }
 
     @Override

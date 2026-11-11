@@ -227,6 +227,11 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     }
 
     @Override
+    public long getNextOutputRate(int direction) {
+        return this.logic.getNextOutputRate(direction);
+    }
+
+    @Override
     public void setOutputRate(long value) {
         this.logic.setOutputRate(value);
     }
@@ -239,6 +244,11 @@ public class EnergyInterfacePart extends UpgradeablePart implements EnergyInterf
     @Override
     public void cycleEnergyCapacity(int direction) {
         this.logic.cycleEnergyCapacity(direction);
+    }
+
+    @Override
+    public long getNextCapacity(int direction) {
+        return this.logic.getNextCapacity(direction);
     }
 
     @Override

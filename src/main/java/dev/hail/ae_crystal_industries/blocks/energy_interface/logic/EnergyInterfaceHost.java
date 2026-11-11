@@ -24,11 +24,15 @@ public interface EnergyInterfaceHost extends IUpgradeableObject, IPriorityHost, 
 
     void cycleOutputRate(int direction);
 
+    long getNextOutputRate(int direction);
+
     void setOutputRate(long value);
 
     long getEnergyCapacity();
 
     void cycleEnergyCapacity(int direction);
+
+    long getNextCapacity(int direction);
 
     void setCapacity(long value);
 

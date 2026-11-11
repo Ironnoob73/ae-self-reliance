@@ -187,17 +187,26 @@ public final class EnergyInterfaceLogic {
     }
 
     public void cycleOutputRate(int direction) {
-        outputRate = nextStep(OUTPUT_RATE_STEPS, outputRate, direction);
+        outputRate = getNextOutputRate(direction);
         saveChanges.run();
     }
 
     public void cycleEnergyCapacity(int direction) {
-        capacity = nextStep(CAPACITY_STEPS, capacity, direction);
+        capacity = getNextCapacity(direction);
         if (storedEnergy > capacity) {
             storedEnergy = capacity;
         }
         saveChanges.run();
     }
+
+    public long getNextOutputRate(int direction) {
+        return nextStep(OUTPUT_RATE_STEPS, outputRate, direction);
+    }
+
+    public long getNextCapacity(int direction) {
+        return nextStep(CAPACITY_STEPS, capacity, direction);
+    }
+
 
     public void setOutputRate(long value) {
         long newRate = Math.clamp(value, 0, MAX_OUTPUT_RATE);
@@ -390,7 +399,7 @@ public final class EnergyInterfaceLogic {
         storedEnergy = Math.clamp(tag.getLong("stored_energy"), 0, capacity);
     }
 
-    private static long nextStep(long[] values, long current, long direction) {
+    private static long nextStep(long[] values, long current, int direction) {
         int index = 0;
         for (int i = 0; i < values.length; i++) {
             if (values[i] <= current) {
@@ -400,7 +409,7 @@ public final class EnergyInterfaceLogic {
 
         if (direction > 0) {
             index = Math.min(values.length - 1, index + 1);
-        } else if (direction < 0) {
+        } else if (direction < 0 && values[index] == current) {
             index = Math.max(0, index - 1);
         }
 
