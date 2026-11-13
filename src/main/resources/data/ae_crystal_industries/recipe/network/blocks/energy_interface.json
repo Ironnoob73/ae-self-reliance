@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:ingots/iron"
+    },
+    "b": {
+      "item": "ae2:quartz_glass"
+    },
+    "c": {
+      "item": "ae2:formation_core"
+    },
+    "d": {
+      "tag": "c:storage_blocks/redstone"
+    }
+  },
+  "pattern": [
+    "aba",
+    "dcd",
+    "aba"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:energy_interface"
+  }
+}

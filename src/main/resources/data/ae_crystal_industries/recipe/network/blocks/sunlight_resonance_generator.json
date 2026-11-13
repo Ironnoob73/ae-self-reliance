@@ -6,19 +6,25 @@
       "tag": "c:ingots/iron"
     },
     "b": {
-      "item": "ae2:quartz_glass"
+      "item": "minecraft:daylight_detector"
     },
     "c": {
       "item": "ae2:energy_acceptor"
+    },
+    "d": {
+      "tag": "c:ingots/gold"
+    },
+    "e": {
+      "tag": "c:storage_blocks/lapis"
     }
   },
   "pattern": [
+    "ded",
     "aba",
-    "aca",
-    "aba"
+    "aca"
   ],
   "result": {
     "count": 1,
-    "id": "ae_crystal_industries:energy_interface"
+    "id": "ae_crystal_industries:sunlight_resonance_generator"
   }
 }
