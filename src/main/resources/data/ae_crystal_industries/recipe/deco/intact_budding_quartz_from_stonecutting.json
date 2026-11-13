@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "ae2:quartz_block"
+  },
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:intact_budding_quartz"
+  }
+}

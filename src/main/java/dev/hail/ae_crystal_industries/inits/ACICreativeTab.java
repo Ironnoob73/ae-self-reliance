@@ -17,6 +17,7 @@ public final class ACICreativeTab {
                     .title(Component.translatable("tab.ae_crystal_industries"))
                     .icon(() -> ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get().asItem().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(ACIBlocks.INTACT_BUDDING_QUARTZ.get());
                         output.accept(ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get());
                         output.accept(ACIBlocks.ENERGY_INTERFACE.get());
                         output.accept(ACIItems.ENERGY_INTERFACE_PART.get());

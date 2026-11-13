@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "ae_crystal_industries:intact_budding_quartz"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "ae2:certus_quartz_crystal"
+  }
+}

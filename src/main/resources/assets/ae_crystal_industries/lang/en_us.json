@@ -1,5 +1,6 @@
 {
   "tab.ae_crystal_industries": "Applied Energistics 2: Crystal Industries",
+  "block.ae_crystal_industries.intact_budding_quartz": "Intact Budding Certus Quartz",
   "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator",
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "Skylight strength: %s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",

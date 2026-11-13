@@ -1,5 +1,6 @@
 {
   "tab.ae_crystal_industries": "应用能源2：水晶工业",
+  "block.ae_crystal_industries.intact_budding_quartz": "未损坏的赛特斯石英母岩",
   "block.ae_crystal_industries.sunlight_resonance_generator": "日光谐振发电机",
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "天空光照强度：%s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
