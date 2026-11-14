@@ -2,6 +2,12 @@
   "tab.ae_crystal_industries": "Applied Energistics 2: Crystal Industries",
 
   "item.ae_crystal_industries.tactical_pancake": "Tactical Pancake",
+  "item.ae_crystal_industries.integrated_processor_press": "Inscriber Integrated Press",
+  "item.ae_crystal_industries.industry_processor_press": "Inscriber Industry Press",
+  "item.ae_crystal_industries.printed_integrated_processor": "Printed Integrated Circuit",
+  "item.ae_crystal_industries.printed_industry_processor": "Printed Industry Circuit",
+  "item.ae_crystal_industries.integrated_processor": "Integrated Processor",
+  "item.ae_crystal_industries.industry_processor": "Industry Processor",
   "block.ae_crystal_industries.intact_budding_quartz": "Intact Budding Certus Quartz",
   "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator",
   "block.ae_crystal_industries.energy_interface": "Energy Interface",

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ae_crystal_industries:item/printed_integrated_processor"
+  }
+}

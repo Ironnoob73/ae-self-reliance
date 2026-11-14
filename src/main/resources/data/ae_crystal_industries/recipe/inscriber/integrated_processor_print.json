@@ -1,0 +1,16 @@
+{
+  "type": "ae2:inscriber",
+  "ingredients": {
+    "middle": {
+      "tag": "c:gems/amethyst"
+    },
+    "top": {
+      "item": "ae_crystal_industries:integrated_processor_press"
+    }
+  },
+  "mode": "inscribe",
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:printed_integrated_processor"
+  }
+}

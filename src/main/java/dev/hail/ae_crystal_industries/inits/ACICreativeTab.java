@@ -18,6 +18,12 @@ public final class ACICreativeTab {
                     .icon(() -> ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get().asItem().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ACIItems.TACTICAL_PANCAKE.get());
+                        output.accept(ACIItems.INTEGRATED_PROCESSOR_PRESS.get());
+                        output.accept(ACIItems.INDUSTRY_PROCESSOR_PRESS.get());
+                        output.accept(ACIItems.PRINTED_INTEGRATED_PROCESSOR.get());
+                        output.accept(ACIItems.PRINTED_INDUSTRY_PROCESSOR.get());
+                        output.accept(ACIItems.INTEGRATED_PROCESSOR.get());
+                        output.accept(ACIItems.INDUSTRY_PROCESSOR.get());
                         output.accept(ACIBlocks.INTACT_BUDDING_QUARTZ.get());
                         output.accept(ACIBlocks.SUNLIGHT_RESONANCE_GENERATOR.get());
                         output.accept(ACIBlocks.ENERGY_INTERFACE.get());

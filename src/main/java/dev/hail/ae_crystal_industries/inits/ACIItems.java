@@ -9,12 +9,9 @@ import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfacePar
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 /**
  * Item registry of this mod.
@@ -27,6 +24,24 @@ public final class ACIItems {
             () -> new Item(new Item.Properties().food((new FoodProperties.Builder()).nutrition(9).saturationModifier(0.75F)
                     .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_BOOST, 36000, 1), 1.0F)
                     .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 36000, 1), 1.0F).build())));
+
+    public static final DeferredItem<MaterialItem> INTEGRATED_PROCESSOR_PRESS = ITEMS.register("integrated_processor_press",
+            () -> new MaterialItem(new Item.Properties()));
+
+    public static final DeferredItem<MaterialItem> INDUSTRY_PROCESSOR_PRESS = ITEMS.register("industry_processor_press",
+            () -> new MaterialItem(new Item.Properties()));
+
+    public static final DeferredItem<MaterialItem> PRINTED_INTEGRATED_PROCESSOR = ITEMS.register("printed_integrated_processor",
+            () -> new MaterialItem(new Item.Properties()));
+
+    public static final DeferredItem<MaterialItem> PRINTED_INDUSTRY_PROCESSOR = ITEMS.register("printed_industry_processor",
+            () -> new MaterialItem(new Item.Properties()));
+
+    public static final DeferredItem<MaterialItem> INTEGRATED_PROCESSOR = ITEMS.register("integrated_processor",
+            () -> new MaterialItem(new Item.Properties()));
+
+    public static final DeferredItem<MaterialItem> INDUSTRY_PROCESSOR = ITEMS.register("industry_processor",
+            () -> new MaterialItem(new Item.Properties()));
 
     public static final DeferredItem<PartItem<EnergyInterfacePart>> ENERGY_INTERFACE_PART = ITEMS.register(
             "energy_interface_part",

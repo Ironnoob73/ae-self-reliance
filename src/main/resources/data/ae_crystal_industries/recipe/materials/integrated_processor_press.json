@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "ae2:knife"
+    },
+    {
+      "tag": "c:storage_blocks/iron"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:integrated_processor_press"
+  }
+}
