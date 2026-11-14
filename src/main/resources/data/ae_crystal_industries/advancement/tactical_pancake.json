@@ -1,0 +1,34 @@
+{
+  "parent": "ae_crystal_industries:root",
+  "criteria": {
+    "pancake": {
+      "conditions": {
+        "items": [
+          {
+            "items": "ae_crystal_industries:tactical_pancake"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "title": {
+      "translate": "achievement.ae_crystal_industries.tactical_pancake"
+    },
+    "description": {
+      "translate": "achievement.ae_crystal_industries.tactical_pancake.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "ae_crystal_industries:tactical_pancake"
+    },
+    "announce_to_chat": false,
+    "show_toast": true
+  },
+  "requirements": [
+    [
+      "pancake"
+    ]
+  ]
+}

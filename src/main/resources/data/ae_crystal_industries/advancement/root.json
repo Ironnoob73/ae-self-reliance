@@ -1,0 +1,34 @@
+{
+  "criteria": {
+    "amethyst": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:gems/amethyst"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "ae_crystal_industries:textures/block/intact_budding_quartz.png",
+    "description": {
+      "translate": "achievement.ae_crystal_industries.root.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "ae_crystal_industries:intact_budding_quartz"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "achievement.ae_crystal_industries.root"
+    }
+  },
+  "requirements": [
+    [
+      "amethyst"
+    ]
+  ]
+}

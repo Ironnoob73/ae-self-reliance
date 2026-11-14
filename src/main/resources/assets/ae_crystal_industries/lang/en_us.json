@@ -1,16 +1,24 @@
 {
   "tab.ae_crystal_industries": "Applied Energistics 2: Crystal Industries",
+
+  "item.ae_crystal_industries.tactical_pancake": "Tactical Pancake",
   "block.ae_crystal_industries.intact_budding_quartz": "Intact Budding Certus Quartz",
   "block.ae_crystal_industries.sunlight_resonance_generator": "Sunlight Resonance Generator",
+  "block.ae_crystal_industries.energy_interface": "Energy Interface",
+  "item.ae_crystal_industries.energy_interface_part": "Energy Interface Panel",
+
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "Skylight strength: %s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
   "gui.ae_crystal_industries.sunlight_resonance_generator.cant_see_sky": "The sky has been blocked",
-  "block.ae_crystal_industries.energy_interface": "Energy Interface",
-  "item.ae_crystal_industries.energy_interface_part": "Energy Interface Panel",
   "gui.ae_crystal_industries.energy_interface": "Energy Interface",
   "gui.ae_crystal_industries.energy_interface.output_rate": "Rate: %s FE/t",
   "gui.ae_crystal_industries.energy_interface.capacity": "Buffer: %s FE",
   "gui.ae_crystal_industries.energy_interface.stored": "Stored: %s FE",
   "gui.ae_crystal_industries.energy_interface.conversion": "Conversion: %s AE to 1 FE",
-  "gui.ae_crystal_industries.set_value": "Set Value"
+  "gui.ae_crystal_industries.set_value": "Set Value",
+
+  "achievement.ae_crystal_industries.root": "Crystal Industries",
+  "achievement.ae_crystal_industries.root.desc": "Maybe you still need other industry mods?",
+  "achievement.ae_crystal_industries.tactical_pancake": "Delicious Pancake",
+  "achievement.ae_crystal_industries.tactical_pancake.desc": "When you eat pancakes, you should thank the God of Pancake, rather than ungratefully asking, \"Where did my bucket go?\""
 }

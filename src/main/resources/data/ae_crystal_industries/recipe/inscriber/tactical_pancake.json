@@ -1,0 +1,19 @@
+{
+  "type": "ae2:inscriber",
+  "ingredients": {
+    "bottom": {
+      "tag": "c:buckets/milk"
+    },
+    "middle": {
+      "tag": "c:eggs"
+    },
+    "top": {
+      "tag": "c:flours/wheat"
+    }
+  },
+  "mode": "press",
+  "result": {
+    "count": 1,
+    "id": "ae_crystal_industries:tactical_pancake"
+  }
+}

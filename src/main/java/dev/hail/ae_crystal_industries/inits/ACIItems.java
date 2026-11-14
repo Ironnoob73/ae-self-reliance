@@ -1,13 +1,20 @@
 package dev.hail.ae_crystal_industries.inits;
 
 import appeng.api.parts.PartModels;
+import appeng.items.materials.MaterialItem;
 import appeng.items.parts.PartItem;
 import appeng.items.parts.PartModelsHelper;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfacePart;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 /**
  * Item registry of this mod.
@@ -15,6 +22,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ACIItems {
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(AeCrystalIndustriesMod.MOD_ID);
+
+    public static final DeferredItem<Item> TACTICAL_PANCAKE = ITEMS.register("tactical_pancake",
+            () -> new Item(new Item.Properties().food((new FoodProperties.Builder()).nutrition(9).saturationModifier(0.75F)
+                    .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_BOOST, 36000, 1), 1.0F)
+                    .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 36000, 1), 1.0F).build())));
 
     public static final DeferredItem<PartItem<EnergyInterfacePart>> ENERGY_INTERFACE_PART = ITEMS.register(
             "energy_interface_part",
