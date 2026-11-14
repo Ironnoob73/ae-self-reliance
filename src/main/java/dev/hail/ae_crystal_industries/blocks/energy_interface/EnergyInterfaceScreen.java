@@ -60,7 +60,7 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.output_rate",
                         IFormattedTextScreen.format(menu.outputRate)),
-                8, 21, plainTextColor, false);
+                8, 24, plainTextColor, false);
         guiGraphics.drawString(font,
                 Component.translatable("gui.ae_crystal_industries.energy_interface.capacity",
                         IFormattedTextScreen.format(menu.energyCapacity)),
@@ -70,10 +70,14 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
                         IFormattedTextScreen.format(menu.storedEnergy)),
                 8, 61, plainTextColor, false);
 
-        setOutputRateDownButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextOutputRateDown))));
-        setOutputRateUpButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextOutputRateUp))));
-        setCapacityDownButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextCapacityDown))));
-        setCapacityUpButton.setTooltip(Tooltip.create(Component.literal(IFormattedTextScreen.format(menu.nextCapacityUp))));
+        setOutputRateDownButton.setTooltip(Tooltip.create(Component.translatable("gui.ae_crystal_industries.set_rate",
+                IFormattedTextScreen.format(menu.nextOutputRateDown))));
+        setOutputRateUpButton.setTooltip(Tooltip.create(Component.translatable("gui.ae_crystal_industries.set_rate",
+                IFormattedTextScreen.format(menu.nextOutputRateUp))));
+        setCapacityDownButton.setTooltip(Tooltip.create(Component.translatable("gui.ae_crystal_industries.set_rate",
+                IFormattedTextScreen.format(menu.nextCapacityDown))));
+        setCapacityUpButton.setTooltip(Tooltip.create(Component.translatable("gui.ae_crystal_industries.set_rate",
+                IFormattedTextScreen.format(menu.nextCapacityUp))));
 
         // Simple buffer fill bar.
         int barX = 8;
@@ -85,7 +89,7 @@ public class EnergyInterfaceScreen extends UpgradeableScreen<EnergyInterfaceMenu
             int filled = (int) Math.round((double) menu.storedEnergy / menu.energyCapacity * (barWidth - 2));
             filled = Math.clamp(filled, 0, barWidth - 2);
             if (filled > 0) {
-                guiGraphics.fill(barX + 1, barY + 1, barX + 1 + filled, barY + barHeight - 1, 0xFF3A8FD8);
+                guiGraphics.fill(barX + 1, barY + 1, barX + 1 + filled, barY + barHeight - 1, 0xFFD83A3A);
             }
         }
 

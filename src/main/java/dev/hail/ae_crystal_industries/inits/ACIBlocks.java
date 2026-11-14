@@ -3,6 +3,7 @@ package dev.hail.ae_crystal_industries.inits;
 import appeng.block.AEBaseBlockItem;
 import appeng.decorative.AEDecorativeBlock;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
+import dev.hail.ae_crystal_industries.blocks.blasting_simulation_chamber.BlastingSimulationChamberBlock;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceBlock;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorBlock;
 import net.minecraft.world.item.BlockItem;
@@ -28,6 +29,11 @@ public final class ACIBlocks {
     public static final DeferredBlock<Block> INTACT_BUDDING_QUARTZ = registerBlock(
             "intact_budding_quartz",
             () -> new AEDecorativeBlock(QUARTZ_PROPERTIES),
+            AEBaseBlockItem::new);
+
+    public static final DeferredBlock<BlastingSimulationChamberBlock> BLASTING_SIMULATION_CHAMBER = registerBlock(
+            "blasting_simulation_chamber",
+            BlastingSimulationChamberBlock::new,
             AEBaseBlockItem::new);
 
     public static final DeferredBlock<SunlightResonanceGeneratorBlock> SUNLIGHT_RESONANCE_GENERATOR = registerBlock(

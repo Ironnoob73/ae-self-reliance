@@ -3,6 +3,7 @@ package dev.hail.ae_crystal_industries.inits;
 import appeng.block.AEBaseEntityBlock;
 import appeng.blockentity.AEBaseBlockEntity;
 import dev.hail.ae_crystal_industries.AeCrystalIndustriesMod;
+import dev.hail.ae_crystal_industries.blocks.blasting_simulation_chamber.BlastingSimulationChamberBlockEntity;
 import dev.hail.ae_crystal_industries.blocks.energy_interface.EnergyInterfaceBlockEntity;
 import dev.hail.ae_crystal_industries.blocks.sunlight_resonance_generator.SunlightResonanceGeneratorBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -22,6 +23,12 @@ public final class ACIBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister
             .create(Registries.BLOCK_ENTITY_TYPE, AeCrystalIndustriesMod.MOD_ID);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BlastingSimulationChamberBlockEntity>> BLASTING_SIMULATION_CHAMBER = create(
+            "blasting_simulation_chamber_entity",
+            BlastingSimulationChamberBlockEntity.class,
+            BlastingSimulationChamberBlockEntity::new,
+            ACIBlocks.BLASTING_SIMULATION_CHAMBER);
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SunlightResonanceGeneratorBlockEntity>> SUNLIGHT_RESONANCE_GENERATOR = create(
             "sunlight_resonance_generator_entity",

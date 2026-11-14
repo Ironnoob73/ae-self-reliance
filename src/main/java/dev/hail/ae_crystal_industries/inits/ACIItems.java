@@ -25,6 +25,9 @@ public final class ACIItems {
                     .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_BOOST, 36000, 1), 1.0F)
                     .effect(() -> new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 36000, 1), 1.0F).build())));
 
+    public static final DeferredItem<MaterialItem> AMETHYST_FIBER = ITEMS.register("amethyst_fiber",
+            () -> new MaterialItem(new Item.Properties()));
+
     public static final DeferredItem<MaterialItem> INTEGRATED_PROCESSOR_PRESS = ITEMS.register("integrated_processor_press",
             () -> new MaterialItem(new Item.Properties()));
 

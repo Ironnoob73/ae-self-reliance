@@ -2,6 +2,7 @@
   "tab.ae_crystal_industries": "应用能源2：水晶工业",
 
   "item.ae_crystal_industries.tactical_pancake": "战术煎饼",
+  "item.ae_crystal_industries.amethyst_fiber": "紫水晶纤维",
   "item.ae_crystal_industries.integrated_processor_press": "集成压印模板",
   "item.ae_crystal_industries.industry_processor_press": "工业压印模板",
   "item.ae_crystal_industries.printed_integrated_processor": "集成电路板",
@@ -9,6 +10,7 @@
   "item.ae_crystal_industries.integrated_processor": "集成处理器",
   "item.ae_crystal_industries.industry_processor": "工业处理器",
   "block.ae_crystal_industries.intact_budding_quartz": "未损坏的赛特斯石英母岩",
+  "block.ae_crystal_industries.blasting_simulation_chamber": "爆破模拟仓",
   "block.ae_crystal_industries.sunlight_resonance_generator": "日光谐振发电机",
   "block.ae_crystal_industries.energy_interface": "能源接口",
   "item.ae_crystal_industries.energy_interface_part": "能源接口面板",
@@ -16,11 +18,11 @@
   "gui.ae_crystal_industries.sunlight_resonance_generator.skylight": "天空光照强度：%s",
   "gui.ae_crystal_industries.sunlight_resonance_generator.output_rate": "%s FE/t",
   "gui.ae_crystal_industries.sunlight_resonance_generator.cant_see_sky": "天空被阻挡",
-  "gui.ae_crystal_industries.energy_interface": "能源接口",
   "gui.ae_crystal_industries.energy_interface.output_rate": "输出速率：%s FE/t",
   "gui.ae_crystal_industries.energy_interface.capacity": "储能上限：%s FE",
   "gui.ae_crystal_industries.energy_interface.stored": "已存储：%s FE",
   "gui.ae_crystal_industries.energy_interface.conversion": "转化率：%s AE → 1 FE",
+  "gui.ae_crystal_industries.set_rate": "设置为 %s",
   "gui.ae_crystal_industries.set_value": "设置数值",
 
   "achievement.ae_crystal_industries.root": "水晶工业",

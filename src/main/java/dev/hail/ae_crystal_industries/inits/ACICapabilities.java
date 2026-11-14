@@ -18,6 +18,9 @@ public final class ACICapabilities {
         // AE2 only registers this capability for its own block entities. Addons must do it themselves, otherwise
         // AE2 cannot discover the grid node when it scans in from a neighboring cable/controller.
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
+                ACIBlockEntities.BLASTING_SIMULATION_CHAMBER.get(),
+                (blockEntity, side) -> blockEntity);
+        event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 ACIBlockEntities.SUNLIGHT_RESONANCE_GENERATOR.get(),
                 (blockEntity, side) -> blockEntity);
         event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST,

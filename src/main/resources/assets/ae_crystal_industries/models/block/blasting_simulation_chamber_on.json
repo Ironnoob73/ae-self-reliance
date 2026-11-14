@@ -1,0 +1,6 @@
+{
+  "parent": "ae_crystal_industries:block/blasting_simulation_chamber",
+  "textures": {
+    "front": "ae_crystal_industries:block/blasting_simulation_chamber_front_on"
+  }
+}
